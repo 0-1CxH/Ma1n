@@ -63,6 +63,15 @@
     const confirmLinkButton = document.querySelector('.btn.btn-secondary.smaller-round-button.hover-color-change img[alt="ConfirmLink"]');
     confirmLinkButton.parentElement.addEventListener('click', handleConfirmLink);
 
+    document.getElementById('link-input-modal-textbox').addEventListener('keydown', function(event) {
+        if (event.shiftKey && event.key === 'Enter') {
+            event.preventDefault(); // Prevent the default newline behavior
+            handleConfirmLink();
+        } else if (event.key === 'Escape') {
+            handleLinkInput();
+        }
+    });
+
 });
 </script>
 {% endblock %}

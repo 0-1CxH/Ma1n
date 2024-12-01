@@ -36,14 +36,24 @@ function toggleLinkInputModal() {
 
 function linkModalAdaptiveHeight() {
     const linkInputTextbox = document.getElementById('link-input-modal-textbox');
-    linkInputTextbox.addEventListener('input', () => {
+    linkInputTextbox.addEventListener('change', adjustTextboxSize);
+    linkInputTextbox.addEventListener('input', adjustTextboxSize);
+
+    function adjustTextboxSize() {
         const proxHeight = Math.ceil(linkInputTextbox.value.length / 20); 
         const extraEmPerLine = linkInputTextbox.value.split('\n').length; // each new line needs 1em
         linkInputTextbox.style.height = `calc(${proxHeight}vh + ${extraEmPerLine}em)`;
-        linkInputTextbox.style.width = `calc(${proxHeight * 20}vw)`;
-    });
+        linkInputTextbox.style.width = `calc(${proxHeight * 15}vw)`;
+    }
 }
 
+
+function clearLinkInputModalTextBox() {
+    const linkInputTextBox = document.getElementById('link-input-modal-textbox');
+    linkInputTextBox.value = '';
+    linkInputTextBox.style.height = '1em';
+    linkInputTextBox.style.width = '1em';
+}
 
 function handleConfirmLink() {
     const weblinkInput = document.getElementById('link-input-modal-textbox').value;
@@ -56,7 +66,9 @@ function handleConfirmLink() {
             }
         }
         enteredLinks.push(...urls);
+        renderMaterialCards();
     });
+    clearLinkInputModalTextBox();
 }
 
 

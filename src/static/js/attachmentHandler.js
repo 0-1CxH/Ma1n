@@ -6,7 +6,7 @@ function handleFileUpload(event) {
     for (let i = 0; i < files.length; i++) {
       if (files[i].size <= fileSizeLimit) { // Check if file size is <= 100MB
         uploadedFiles.push(files[i]);
-        renderFileCards();
+        renderMaterialCards();
       } else {
         addNotification(`File "${files[i].name}" (${fileSizeFormatter(files[i].size)}) exceeds the file size limit (${fileSizeFormatter(fileSizeLimit)}) and will not be uploaded.`, 'error');
       }
@@ -16,7 +16,6 @@ function handleFileUpload(event) {
 function  fileSizeFormatter(size) {
     let units = 'B';
     let formattedSize = size;
-    console.log(size)
     const sizeLevels = { 'GB': 1024 ** 3, 'MB': 1024 ** 2, 'KB': 1024 };
     
     for (const [unit, limit] of Object.entries(sizeLevels)) {
@@ -29,10 +28,8 @@ function  fileSizeFormatter(size) {
     return formattedSize.toFixed(2) + ' ' + units;
 }
 
-function FileNameFormatter(file) {
-    const maxLength = 40;
-    const saveSuffix = 7;
-    const truncatedName = file.name.length > maxLength ? file.name.substring(0, maxLength - saveSuffix) + '...' + file.name.substring(file.name.length- saveSuffix+1, file.name.length): file.name;
+function truncateStr(s, maxLength, saveSuffix) {
+    const truncatedName = s.length > maxLength ? s.substring(0, maxLength - saveSuffix) + '...' + s.substring(s.length- saveSuffix+1, s.length): s;
     return truncatedName 
 }
 
@@ -42,7 +39,7 @@ function fileInfoFormatter(file) {
     return  truncatedType + ', ' + fileSizeFormatter(file.size);
 }
 
-function renderFileCards() {
+function renderMaterialCards() {
 
     // 获取 card 容器
     const cardContainer = document.getElementById('material-cards-container');
@@ -56,17 +53,31 @@ function renderFileCards() {
     let cardsHtml = '';
     let cardDeckHtml = '';
     //<class="card-title">  <class="card-text">
+    // <span class="badge ">[${index + 1}]</span>
+    // <span class="badge secondary-badge">[${index + 1}]</span>
 
     uploadedFiles.forEach((file, index) => {
         cardDeckHtml += `
             <div class="card material-card" style="margin: 2px;">
                 <div class="card-body" style="padding: 5px;">
-                    <span style="font-size: smaller; color: black;">${FileNameFormatter(file)}</span>
-                    <span style="font-size: smaller; color: grey;">${fileInfoFormatter(file)}</span>
+                    <span style="color: black;">${file.name}</span><br>
+                    <span style="color: grey; font-size: smaller;"> [${fileSizeFormatter(file.size)}, ${file.type}]</span>
                 </div>
             </div>
         `;
     });
+
+    enteredLinks.forEach((link, index) => {
+        cardDeckHtml += `
+            <div class="card material-card" style="margin: 2px;">
+                <div class="card-body" style="padding: 5px;">
+                    <span style="color: black;">${link}</span><br>
+                    <span style="color: grey; font-size: smaller;">[weblink]</span>
+                </div>
+            </div>
+        `;
+    });
+
     cardsHtml = cardDeckHtml;
     // 将生成的卡片 HTML 字符串插入到 card 容器中
     cardContainer.innerHTML = cardsHtml;
