@@ -1,4 +1,11 @@
-const currentEditorMode = "markdown"
+const editorModes = ["plain", "markdown"]
+let currentEditorModeIndex = 0
+let currentEditorMode = "plain"
+
+function changeEditorMode() {
+    currentEditorModeIndex = (currentEditorModeIndex + 1) % editorModes.length;
+    setEditorMode(editorModes[currentEditorModeIndex]);
+}
 
 function setEditorMode(mode) {
     currentEditorMode = mode

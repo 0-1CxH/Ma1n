@@ -9,10 +9,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/notification-bar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/containers.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/buttons.css') }}">
 
     
     {% block cssExtension %}
     {% endblock %}
+
+    <script src="{{ url_for('static', filename='js/marked.min.js') }}"></script>
 
 
 
@@ -39,7 +42,8 @@
 
     <!-- Scripts -->
     <script src="{{ url_for('static', filename='js/notificationHandler.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/marked.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/buttonStyler.js') }}"></script>
+    
     {% block jsExtension %}
     {% endblock %}
 

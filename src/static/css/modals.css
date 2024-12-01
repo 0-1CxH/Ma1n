@@ -1,0 +1,24 @@
+.input-modal-overlay {
+    padding: 8px;
+    margin-left: 5px;
+    border-radius: 8px;
+    
+}
+
+.input-modal-textbox {
+    width: 20vw;
+    max-width: 60vw;
+    min-width: 20vw;
+    min-height: 36px;
+    height: 32px;
+    max-height: 30vh;
+    border: 1px solid grey;
+    border-radius: 8px;
+}
+
+.link-entry-modal-window {
+    background-color: #efefef;
+    padding: 8px;
+    border-radius: 8px;
+    border: solid 2px grey;
+  }

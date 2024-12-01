@@ -28,3 +28,8 @@
     margin: 5px;
     font-size: medium;
 }
+
+.buttons-container {
+  height: 64px;
+  margin: 5px;
+}

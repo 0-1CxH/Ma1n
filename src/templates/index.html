@@ -2,11 +2,10 @@
 
 {% block cssExtension %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/editors.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
 {% endblock %}
 
-{% block jsExtension %}
-<script src="{{ url_for('static', filename='js/editorHandler.js') }}"></script>
-{% endblock %}
+
 
 {% block pageMainContent %}
 <div class="title-logo-container text-center primary-font-variant">
@@ -15,6 +14,56 @@
 
 <div id="main-input-editor" class="editor-container primary-font"></div>
 
+<div class="d-flex" role="group" aria-label="input control buttons">
+    <button class="btn btn-secondary simple-round-button hover-color-change">
+        <img src="{{ url_for('static', filename='images/modeChange.png') }}" alt="Editor Mode Change" style="width: 24px; height: 24px;">
+    </button>
+    <button class="btn btn-secondary simple-round-button hover-color-change">
+        <img src="{{ url_for('static', filename='images/addAttachment.png') }}" alt="Add Attachment" style="width: 36px; height: 36px;">
+        <input type="file" multiple/>
+    </button>
+
+    <button class="btn btn-secondary simple-round-button hover-color-change">
+        <img src="{{ url_for('static', filename='images/addWeblink.png') }}" alt="Add Weblink" style="width: 24px; height: 24px;">
+    </button>
+
+    <div id="link-input-modal" class="input-modal-overlay d-flex primary-font" style="display: none;">
+        <textarea id="link-input-modal-textbox" class="input-modal-textbox" rows="1"></textarea>
+        
+        <button class="btn btn-secondary smaller-round-button hover-color-change", style="margin-left: 5px;">
+            <img src="{{ url_for('static', filename='images/confirm.png') }}" alt="ConfirmLink" style="width: 24px; height: 24px;">
+        </button> 
+    </div>
+
+    
+    
+</div>
 
 
+
+
+{% endblock %}
+
+
+
+{% block jsExtension %}
+<script src="{{ url_for('static', filename='js/editorHandler.js') }}"></script>
+<script src="{{ url_for('static', filename='js/attachmentHandler.js') }}"></script>
+<script src="{{ url_for('static', filename='js/weblinkHandler.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const modeChangeButton = document.querySelector('.btn.btn-secondary.simple-round-button.hover-color-change img[alt="Editor Mode Change"]');
+    modeChangeButton.parentElement.addEventListener('click', changeEditorMode);
+
+    const addAttachmentButton = document.querySelector('.btn.btn-secondary.simple-round-button.hover-color-change img[alt="Add Attachment"]');
+    addAttachmentButton.parentElement.querySelector('input[type="file"]').addEventListener('change', handleFileUpload);
+
+    const addWeblinkButton = document.querySelector('.btn.btn-secondary.simple-round-button.hover-color-change img[alt="Add Weblink"]');
+    addWeblinkButton.parentElement.addEventListener('click', handleLinkInput);
+
+    const confirmLinkButton = document.querySelector('.btn.btn-secondary.smaller-round-button.hover-color-change img[alt="ConfirmLink"]');
+    confirmLinkButton.parentElement.addEventListener('click', handleConfirmLink);
+
+});
+</script>
 {% endblock %}
