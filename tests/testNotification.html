@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Test Page</title>
+    <link rel="stylesheet" href="../src/static/css/fonts.css">
+    <link rel="stylesheet" href="../src/static/css/notification-bar.css">
+    <script src="../src/static/js/notificationHandler.js" defer></script>
+</head>
+<body>
+    
+    <div id="page-notification-bar" class="page-notification-bar secondary-font"></div>
+
+    <style>
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 50vh;
+        }
+    </style>
+    <div class="button-container">
+        <p>Notification Handler Test</p>
+        <button onclick="addNotification('This is an info message', 'info')">Add Info Notification</button>
+        <button onclick="addNotification('This is an error message', 'error')">Add Error Notification</button>
+        <button onclick="addNotification('This is a default message', 'default')">Add Default Notification</button>
+    </div>
+    
+</body>
+</html>

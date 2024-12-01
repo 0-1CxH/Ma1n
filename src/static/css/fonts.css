@@ -1,0 +1,12 @@
+.primary-font {
+    font-family: 'Verdana', sans-serif;
+}
+  
+.secondary-font {
+    font-family: 'Verdana', sans-serif, monospace;
+}
+
+.primary-font-variant {
+    font-family: 'Verdana', sans-serif, monospace;
+    letter-spacing: 0.15em;
+}

@@ -1,0 +1,32 @@
+
+.base-editor {
+    overflow: auto;
+    padding: 20px;
+    height: auto;
+    border: 2px solid grey;
+    min-height: 20vh;
+    max-height: 80vh;
+  }
+  
+.half-width-text-input-left {
+    border-top-left-radius: 8px; 
+    border-bottom-left-radius: 8px; 
+    background-color: #fefefe;
+    border-right: 1px solid #ccc;
+    width: 50%;
+}
+
+.half-width-text-output-right {
+    border-top-right-radius: 8px; 
+    border-bottom-right-radius: 8px;
+    background-color: #efefef;
+    border-left: 1px solid #ccc;
+    width: 50%;
+}
+  
+.full-width-text-editor {
+    border-radius: 8px;
+    border: solid 2px grey;
+    background-color: #fefefe;
+    width: 100%;
+}

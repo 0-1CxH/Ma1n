@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base Template</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notification-bar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/containers.css') }}">
+
+    
+    {% block cssExtension %}
+    {% endblock %}
+
+
+
+</head>
+<body>
+
+    
+    <!-- Notification Bar -->
+    <div id="page-notification-bar" class="page-notification-bar secondary-font"></div>
+    
+    <div class="main-content-container d-flex align-items-center justify-content-center">
+
+        <div class="main-content">
+            <!-- Main Content of this Page  -->
+            {% block pageMainContent %}
+            {% endblock %}
+        </div>
+
+        <div id="content"></div>
+
+
+    </div>
+    
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/notificationHandler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/marked.min.js') }}"></script>
+    {% block jsExtension %}
+    {% endblock %}
+
+    
+</body>
+</html>

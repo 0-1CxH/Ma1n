@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block cssExtension %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/editors.css') }}">
+{% endblock %}
+
+{% block jsExtension %}
+<script src="{{ url_for('static', filename='js/editorHandler.js') }}"></script>
+{% endblock %}
+
+{% block pageMainContent %}
+<div class="title-logo-container text-center primary-font-variant">
+    @Ma1n
+</div>
+
+<div id="main-input-editor" class="editor-container primary-font"></div>
+
+
+
+{% endblock %}
