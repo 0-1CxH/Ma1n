@@ -29,3 +29,26 @@
     background-color: white;
     border: 1px solid grey;
   }
+
+  .main-process-button {
+    background-color: black; 
+    min-height: 48px; 
+    width: auto;
+    min-width: 128px; 
+    border-right: 1px solid #ccc;
+    padding: 5px;
+    padding-left: 2em;
+    padding-right: 2em;
+  }
+
+  .main-process-dropdown-button {
+    background-color: black;
+    width: 48px;
+    height:auto;
+    border-left: 1px solid #ccc;
+  }
+
+
+.process-dropdown-menu-item {
+  background-color: white;
+}

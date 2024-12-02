@@ -18,9 +18,9 @@
 }
 
 .title-logo-container {
-    margin: 5px;
+    margin: 1vh;
     font-size: xx-large;
-    height: 5vh;
+    height: 7vh;
 }
 
 .editor-container {
@@ -60,4 +60,9 @@
   color: grey;
   left: auto;
   border: 1px dashed;
+}
+
+.process-button-container {
+  margin: 10px;
+  margin-top: 30px;
 }

@@ -59,7 +59,7 @@ function renderMaterialCards() {
     uploadedFiles.forEach((file, index) => {
         cardDeckHtml += `
             <div class="card material-card" style="margin: 2px;">
-                <div class="card-body" style="padding: 5px;">
+                <div class="card-body align-items-center justify-content-center" style="padding: 5px;">
                     <span style="color: black;">${file.name}</span><br>
                     <span style="color: grey; font-size: smaller;"> [${fileSizeFormatter(file.size)}, ${file.type}]</span>
                 </div>
@@ -70,7 +70,7 @@ function renderMaterialCards() {
     enteredLinks.forEach((link, index) => {
         cardDeckHtml += `
             <div class="card material-card" style="margin: 2px;">
-                <div class="card-body" style="padding: 5px;">
+                <div class="card-body align-items-center justify-content-center" style="padding: 5px;">
                     <span style="color: black;">${link}</span><br>
                     <span style="color: grey; font-size: smaller;">[weblink]</span>
                 </div>

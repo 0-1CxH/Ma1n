@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block pageTitle %}
+@Ma1n Index
+{% endblock %}
+
 {% block cssExtension %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/editors.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
@@ -15,15 +19,15 @@
 <div id="main-input-editor" class="editor-container primary-font"></div>
 
 <div class="d-flex" role="group" aria-label="input control buttons">
-    <button class="btn btn-secondary simple-round-button hover-color-change">
+    <button class="btn btn-secondary simple-round-button hover-color-change hover-border-change">
         <img src="{{ url_for('static', filename='images/modeChange.png') }}" alt="Editor Mode Change" style="width: 24px; height: 24px;">
     </button>
-    <button class="btn btn-secondary simple-round-button hover-color-change">
+    <button class="btn btn-secondary simple-round-button hover-color-change hover-border-change">
         <img src="{{ url_for('static', filename='images/addAttachment.png') }}" alt="Add Attachment" style="width: 36px; height: 36px;">
         <input type="file" multiple/>
     </button>
 
-    <button class="btn btn-secondary simple-round-button hover-color-change">
+    <button class="btn btn-secondary simple-round-button hover-color-change hover-border-change">
         <img src="{{ url_for('static', filename='images/addWeblink.png') }}" alt="Add Weblink" style="width: 24px; height: 24px;">
     </button>
 
@@ -40,6 +44,16 @@
 
 
 
+<div class="process-button-container d-flex justify-content-center">
+        <div class="btn-group" role="group">
+            <button type="button" id="main-process-button" class="btn btn-secondary primary-font-variant main-process-button"></button>
+            <button type="button" id="main-process-dropdown-button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split main-process-dropdown-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="sr-only">Main Process Dropdown</span>
+            </button>
+            <div id="main-process-dropdown-menu" class="dropdown-menu"></div>
+        </div>
+</div>
+
 
 {% endblock %}
 
@@ -49,15 +63,16 @@
 <script src="{{ url_for('static', filename='js/editorHandler.js') }}"></script>
 <script src="{{ url_for('static', filename='js/attachmentHandler.js') }}"></script>
 <script src="{{ url_for('static', filename='js/weblinkHandler.js') }}"></script>
+<script src="{{ url_for('static', filename='js/processButtonHandler.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-    const modeChangeButton = document.querySelector('.btn.btn-secondary.simple-round-button.hover-color-change img[alt="Editor Mode Change"]');
+    const modeChangeButton = document.querySelector('.btn.btn-secondary.simple-round-button.hover-color-change.hover-border-change img[alt="Editor Mode Change"]');
     modeChangeButton.parentElement.addEventListener('click', changeEditorMode);
 
-    const addAttachmentButton = document.querySelector('.btn.btn-secondary.simple-round-button.hover-color-change img[alt="Add Attachment"]');
+    const addAttachmentButton = document.querySelector('.btn.btn-secondary.simple-round-button.hover-color-change.hover-border-change img[alt="Add Attachment"]');
     addAttachmentButton.parentElement.querySelector('input[type="file"]').addEventListener('change', handleFileUpload);
 
-    const addWeblinkButton = document.querySelector('.btn.btn-secondary.simple-round-button.hover-color-change img[alt="Add Weblink"]');
+    const addWeblinkButton = document.querySelector('.btn.btn-secondary.simple-round-button.hover-color-change.hover-border-change img[alt="Add Weblink"]');
     addWeblinkButton.parentElement.addEventListener('click', handleLinkInput);
 
     const confirmLinkButton = document.querySelector('.btn.btn-secondary.smaller-round-button.hover-color-change img[alt="ConfirmLink"]');
@@ -71,6 +86,9 @@
             handleLinkInput();
         }
     });
+
+    const mainProcessButton = document.querySelector('.main-process-button');
+    mainProcessButton.textContent = getSelectedProcessFunction();
 
 });
 </script>

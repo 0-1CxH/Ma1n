@@ -7,5 +7,15 @@ def home():
     return render_template('index.html')
 
 
+@app.route('/procfuncs')
+def get_all_process_functions():
+    process_functions = [
+        "Process A",
+        "Process Very Long Name For Test",
+        "Process C"
+    ]
+    return {"data": process_functions}
+
+
 if __name__ == '__main__':
     app.run()
