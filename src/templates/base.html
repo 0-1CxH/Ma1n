@@ -18,6 +18,9 @@
     {% block cssExtension %}
     {% endblock %}
 
+    {% block initUrls %}
+    {% endblock %}
+
     <script src="{{ url_for('static', filename='js/marked.min.js') }}"></script>
 
 
@@ -41,6 +44,14 @@
 
 
     </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar fixed-top navbar-light buttom-nav-bar primary-font">
+        <div class="container-fluid d-flex justify-content-end">
+            {% block navBarExtension %}
+            {% endblock %}
+        </div>
+    </nav>
     
 
     <!-- Scripts -->

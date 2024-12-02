@@ -31,7 +31,8 @@
   }
 
   .main-process-button {
-    background-color: black; 
+    background-color: black;
+    border-radius: 8px;
     min-height: 48px; 
     width: auto;
     min-width: 128px; 
@@ -42,6 +43,7 @@
   }
 
   .main-process-dropdown-button {
+    border-radius: 8px;
     background-color: black;
     width: 48px;
     height:auto;

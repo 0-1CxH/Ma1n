@@ -10,6 +10,16 @@
 {% endblock %}
 
 
+{% block initUrls %}
+<script>
+    const get_proc_funcs_url = "{{ url_for('get_all_process_functions') }}";
+    const submit_session_url = "{{ url_for('submit_all_and_get_session_id') }}"
+    const fetch_session_url = "{{ url_for('fetch_session_by_id') }}"
+</script>
+{% endblock %}
+
+
+
 
 {% block pageMainContent %}
 <div class="title-logo-container text-center primary-font-variant">
@@ -57,6 +67,12 @@
 
 {% endblock %}
 
+{% block navBarExtension %}
+<a class="navbar-brand" href="{{ url_for('get_sessions') }}">
+    <img src="{{ url_for('static', filename='images/historySessions.png') }}" width="24px" height="24px" alt="History Sessions">
+</a>
+{% endblock %}
+
 
 
 {% block jsExtension %}
@@ -68,6 +84,14 @@
     document.addEventListener('DOMContentLoaded', () => {
     const modeChangeButton = document.querySelector('.btn.btn-secondary.simple-round-button.hover-color-change.hover-border-change img[alt="Editor Mode Change"]');
     modeChangeButton.parentElement.addEventListener('click', changeEditorMode);
+
+    const mainInputEditor = document.querySelector('#main-input-editor');
+    mainInputEditor.addEventListener('keydown', (event) => {
+        if (event.shiftKey && event.key === 'Enter') {
+            event.preventDefault(); // Prevent the default newline behavior
+            mainSubmit();
+        }
+    });
 
     const addAttachmentButton = document.querySelector('.btn.btn-secondary.simple-round-button.hover-color-change.hover-border-change img[alt="Add Attachment"]');
     addAttachmentButton.parentElement.querySelector('input[type="file"]').addEventListener('change', handleFileUpload);
@@ -89,6 +113,9 @@
 
     const mainProcessButton = document.querySelector('.main-process-button');
     mainProcessButton.textContent = getSelectedProcessFunction();
+    mainProcessButton.addEventListener('click', () => {
+        mainSubmit();
+    });
 
 });
 </script>

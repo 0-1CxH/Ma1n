@@ -1,8 +1,8 @@
-let selectedProcessFunction = "Process"
 const allProcessFunctions = getAllProcessFunctions();
+let selectedProcessFunction = "Process"
 
 function getAllProcessFunctions() {
-    return fetch('/procfuncs')
+    return fetch(get_proc_funcs_url)
         .then(response => response.json())
         .then(data => {
             return data;
@@ -16,6 +16,47 @@ function getAllProcessFunctions() {
 function getSelectedProcessFunction() {
     return selectedProcessFunction;
 }
+
+function mainSubmit() {
+    const formData = new FormData();
+    formData.append('userInput', getEditorUserInputValue());
+    // Assuming uploadedFiles and enteredLinks are accessible and are arrays
+    uploadedFiles.forEach(file => {
+        formData.append('uploadedFiles', file);
+    });
+    enteredLinks.forEach(link => {
+        formData.append('enteredLinks', link);
+    });
+    formData.append('selectedProcessFunction', getSelectedProcessFunction());
+
+    // debug
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+
+    fetch(submit_session_url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.log('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        addNotification('Session submitted successfully! Session ID: ' + data.sessionId, 'success');
+        console.log('Form submission success:', data);
+        let sessionId = data.sessionId;
+        window.location.href = `${fetch_session_url}?id=${sessionId}`;
+    })
+    .catch(error => {
+        addNotification('Error submitting form: ' + error.message, 'error');
+    });
+
+    
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const dropdownButton = document.getElementById('main-process-dropdown-button');

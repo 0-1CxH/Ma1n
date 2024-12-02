@@ -51,6 +51,16 @@ function renderEditor() {
     } 
 }
 
+function getEditorUserInputValue() {
+    const mainInputEditor = document.getElementById("main-input-editor");
+    if (currentEditorMode === "plain") {
+        return mainInputEditor.querySelector(".full-width-text-editor").value;
+    } else if (currentEditorMode === "markdown") {
+        return mainInputEditor.querySelector(".half-width-text-input-left").value;
+    }
+    return ""; // Default return if no matching mode
+}
+
 
 
 renderEditor();

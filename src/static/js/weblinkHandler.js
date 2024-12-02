@@ -71,20 +71,5 @@ function handleConfirmLink() {
     clearLinkInputModalTextBox();
 }
 
-
-// function addLink() {
-//     this.showLinkEntryModal = false; // Hide modal
-//     const lines = this.tempLink.split('\n');
-//     lines.forEach(line => {
-//       const urls = this.extractUrls(line);
-//       if (urls.length === 0) {
-//         if (line.trim() !== '') {
-//           this.addPageMessage(`No URL found in the provided line: "${line}".`, 'error');
-//         }
-//       }
-//       this.enteredLinks.push(...urls);
-//     });
-// }
-
 toggleLinkInputModal();
 linkModalAdaptiveHeight();
