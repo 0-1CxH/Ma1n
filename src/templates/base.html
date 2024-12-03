@@ -21,7 +21,9 @@
     {% block initUrls %}
     {% endblock %}
 
-    <script src="{{ url_for('static', filename='js/marked.min.js') }}"></script>
+    {% block jsExtensionOnStart %}
+    {% endblock %}
+
 
 
 
@@ -58,7 +60,7 @@
     <script src="{{ url_for('static', filename='js/notificationHandler.js') }}"></script>
     
     
-    {% block jsExtension %}
+    {% block jsExtensionOnEnd %}
     {% endblock %}
 
     <script src="{{ url_for('static', filename='js/buttonStyler.js') }}"></script>

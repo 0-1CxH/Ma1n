@@ -72,3 +72,13 @@
   margin-top: 5px;
   z-index: 950;
 }
+
+.session-list-container {
+  width: auto;
+  max-height: 80vh;
+  overflow-y: scroll;
+  border: 2px dashed black;
+  border-radius: 8px;
+  margin: 10px;
+  padding: 5px;
+}

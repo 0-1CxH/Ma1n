@@ -18,6 +18,9 @@
 </script>
 {% endblock %}
 
+{% block jsExtensionOnStart %}
+<script src="{{ url_for('static', filename='js/marked.min.js') }}"></script>
+{% endblock %}
 
 
 
@@ -75,7 +78,7 @@
 
 
 
-{% block jsExtension %}
+{% block jsExtensionOnEnd %}
 <script src="{{ url_for('static', filename='js/editorHandler.js') }}"></script>
 <script src="{{ url_for('static', filename='js/attachmentHandler.js') }}"></script>
 <script src="{{ url_for('static', filename='js/weblinkHandler.js') }}"></script>

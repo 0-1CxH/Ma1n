@@ -1,2 +1,41 @@
 {% extends "base.html" %}
 
+{% block pageTitle %}
+Your @Ma1n Sessions
+{% endblock %}
+
+{% block navBarExtension %}
+<a class="navbar-brand" href="{{ url_for('get_sessions') }}">
+    <img src="{{ url_for('static', filename='images/at.png') }}" width="24px" height="24px" alt="History Sessions">
+</a>
+{% endblock %}
+
+{% block pageMainContent %}
+<div class="session-list-container align-items-center justify-items-center">
+    <!-- <div class="list-group"> -->
+        {% for i in range(1, 100) %}
+        <a href="#" 
+            class="list-group-item list-group-item-action flex-column align-items-start primary-font"
+            style="border: 1px dashed grey; margin: 2px;"
+        >
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">Session {{ i }}</h5>
+            <small class="text-muted">{{ i }} days ago</small>
+          </div>
+          <p class="mb-1">This is a description for session {{ i }}. It contains some details about the session. It contains some details about the session. It contains some details about the session. It contains some details about the session.</p>
+          <small class="text-muted">Additional info for session {{ i }}.</small>
+        </a>
+        {% endfor %}
+        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start primary-font">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">List group item heading</h5>
+            <small class="text-muted">3 days ago</small>
+          </div>
+          <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+          <small class="text-muted">Donec id elit non mi porta.</small>
+        </a>
+      <!-- </div> -->
+</div>
+
+  
+{% endblock %}
