@@ -10,5 +10,5 @@ def load_user(user_id):
     # Here, implement logic to find and return a user given a user_id
     # This is a placeholder implementation; you'll need to adapt it
     # For example, if using an in-memory user list (adjust as needed):
-    user = User.query.get(user_id)  # Assuming you have a queryable User model
+    user = User()  # Assuming you have a queryable User model
     return user

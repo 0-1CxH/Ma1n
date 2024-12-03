@@ -11,6 +11,8 @@ def login():
         user = User()
         # Assuming the user's ID is set to 1 for the example
         user.id = '1'
+        print(f"Username: {request.form.get('username')}")
+        print(f"Password: {request.form.get('password')}")
         login_user(user)
         return redirect(url_for('home'))
     return render_template('login.html')
