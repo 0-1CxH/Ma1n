@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block navBarExtension %}
+<a class="navbar-brand" href="{{ url_for('get_sessions') }}">
+  <img src="{{ url_for('static', filename='images/historySessions.png') }}" width="24px" height="24px" alt="History Sessions">
+</a>
+<a class="navbar-brand" href="{{ url_for('home') }}">
+    <img src="{{ url_for('static', filename='images/at.png') }}" width="24px" height="24px" alt="History Sessions">
+</a>
+
+<a class="navbar-brand navbar-text-container" href="{{ url_for('auth.logout') }}">
+  <div class="navbar-text primary-font">
+    {{ username }}
+  </div>
+  <img src="{{ url_for('static', filename='images/decline.png') }}" width="24px" height="24px" alt="Logout">
+</a>
+{% endblock %}

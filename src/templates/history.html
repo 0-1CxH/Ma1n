@@ -4,8 +4,14 @@
 {{ username }} @Ma1n Sessions
 {% endblock %}
 
+{% block initUrls %}
+<script>
+    const fetch_session_url = "{{ url_for('fetch_session_by_id') }}"
+</script>
+{% endblock %}
+
 {% block navBarExtension %}
-<a class="navbar-brand" href="{{ url_for('get_sessions') }}">
+<a class="navbar-brand" href="{{ url_for('home') }}">
     <img src="{{ url_for('static', filename='images/at.png') }}" width="24px" height="24px" alt="History Sessions">
 </a>
 
@@ -19,29 +25,18 @@
 
 {% block pageMainContent %}
 <div class="session-list-container align-items-center justify-items-center">
-    <!-- <div class="list-group"> -->
-        {% for i in range(1, 100) %}
-        <a href="#" 
-            class="list-group-item list-group-item-action flex-column align-items-start primary-font"
-            style="border: 1px dashed grey; margin: 2px;"
-        >
+    {% for sess_info in all_session_info %}
+    <a href="{{ url_for('fetch_session_by_id') }}?id={{ sess_info.session_id }}"
+            class="list-group-item list-group-item-action flex-column align-items-start primary-font session-list-item">
           <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">Session {{ i }}</h5>
-            <small class="text-muted">{{ i }} days ago</small>
+            <h5 class="mb-1">{{ sess_info.conv_abst.title | safe }}</h5>
+            <small class="text-muted">{{ sess_info.conv_abst.dtime }}</small>
           </div>
-          <p class="mb-1">This is a description for session {{ i }}. It contains some details about the session. It contains some details about the session. It contains some details about the session. It contains some details about the session.</p>
-          <small class="text-muted">Additional info for session {{ i }}.</small>
+          <p class="mb-1" style="max-height: 15vh; overflow-y: scroll;">{{sess_info.conv_abst.abst | safe}}</p>
+          <small class="text-muted">{{ sess_info.conv_abst.note | safe }}</small>
         </a>
-        {% endfor %}
-        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start primary-font">
-          <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">List group item heading</h5>
-            <small class="text-muted">3 days ago</small>
-          </div>
-          <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-          <small class="text-muted">Donec id elit non mi porta.</small>
-        </a>
-      <!-- </div> -->
+    {% endfor %}
+
 </div>
 
   

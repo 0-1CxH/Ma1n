@@ -16,12 +16,11 @@ def login():
             user = UserManager.user_manager_instance.load_user(username)
             login_user(user)
             next_page = request.form.get('next')
-            print(f"{next_page}=")
             if not next_page:
-                next_page = url_for('home')
+                next_page = url_for('get_sessions')
             return redirect(next_page)
         else:
-            return render_template('login.html', error="Invalid username or password")
+            return render_template('login.html', failed=True)
     else:
         return render_template('login.html')
 
@@ -34,7 +33,6 @@ def init_login_manager(app, login_view, user_db_path):
     login_manager = LoginManager()
     login_manager.init_app(app)
     login_manager.login_view = login_view
-    global global_user_manager
     UserManager(user_db_path)
     login_manager.user_loader(UserManager.user_manager_instance.load_user)
     return login_manager

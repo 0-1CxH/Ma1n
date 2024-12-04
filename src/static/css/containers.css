@@ -105,3 +105,13 @@
   padding-left: 10px;
   padding-right: 15px;
 }
+
+.session-list-item {
+  word-wrap: break-word; 
+  word-break: break-all;
+  border: 1px dashed grey; 
+  margin: 2px; 
+  overflow-y: auto;
+  max-height: 30%;
+  width: 99%;
+}

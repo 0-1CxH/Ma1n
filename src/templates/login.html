@@ -16,7 +16,7 @@ Login to @Ma1n
 
 {% block pageMainContent %}
 <div class="title-logo-container text-center primary-font-variant">
-    Login
+    @Ma1n
 </div>
 
 <div class="login-container justify-content-center align-items-center primary-font">
@@ -36,9 +36,13 @@ Login to @Ma1n
     </form>
 </div>
 
-
 {% endblock %}
 
 {% block jsExtensionOnEnd %}
 <script src="{{ url_for('static', filename='js/processButtonHandler.js') }}"></script>
+{% if failed %}
+    <script>
+        addNotification("Login failed. Please use correct username and password.", "error")
+    </script>
+{% endif %}
 {% endblock %}
