@@ -21,12 +21,15 @@ function mainSubmit() {
     const formData = new FormData();
     formData.append('userInput', getEditorUserInputValue());
     // Assuming uploadedFiles and enteredLinks are accessible and are arrays
+    // console.log(uploadedFiles)
     uploadedFiles.forEach(file => {
         formData.append('uploadedFiles', file);
     });
-    enteredLinks.forEach(link => {
-        formData.append('enteredLinks', link);
-    });
+    const joinedLinks = enteredLinks.join('\n');
+    formData.append('enteredLinks', joinedLinks);
+    // enteredLinks.forEach(link => {
+    //     formData.append('enteredLinks', link + '\n');
+    // });
     formData.append('selectedProcessFunction', getSelectedProcessFunction());
 
     // debug

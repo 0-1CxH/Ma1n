@@ -1,6 +1,6 @@
 import uuid
 import os
-from flask import render_template, request, url_for
+from flask import render_template, request, url_for, request
 from flask_login import login_required, current_user
 
 
@@ -35,7 +35,25 @@ def register_main_routes(app, conversation_manager):
         random_session_id = str(uuid.uuid4())
         username = current_user.username
         filepath = os.path.join(conversation_manager.conversation_store_root, username, random_session_id)
-        conversation_manager.add_conversation_info(session_id=random_session_id, owner_username=username, file_path=filepath)
+        conversation_manager.add_conversation_info(session_id=random_session_id, owner_username=username, conversation_folder=filepath)
+
+        user_input = request.form.get('userInput', "")
+        uploaded_files = request.files.getlist('uploadedFiles')
+        if uploaded_files is None:
+            uploaded_files = []
+        entered_links = request.form.get('enteredLinks')
+        if entered_links:
+            entered_links = [_.strip() for _ in entered_links.split("\n")]
+        else:
+            entered_links = []
+        selected_process_function = request.form.get('selectedProcessFunction', "")
+
+        # print(f"{user_input=}, {uploaded_files=}, {entered_links=}, {selected_process_function=}")
+        conversation_manager.add_conversation_abstract(
+            conversation_folder=filepath, 
+            title = user_input[:50],
+            note = f"{selected_process_function} of {len(uploaded_files)} file(s) and {len(entered_links)} link(s)"
+        )
         return {"sessionId": random_session_id}
 
     @app.route('/fetch-session')
@@ -44,3 +62,9 @@ def register_main_routes(app, conversation_manager):
         session_id = request.args.get('id')
         username = current_user.username
         return render_template('conversation.html', username=username, )
+    
+    @app.route('/delete-session')
+    def delete_session_by_id():
+        session_id = request.args.get('id')
+        conversation_manager.delete_conversation_info(session_id)
+        return {"sessionId": session_id}

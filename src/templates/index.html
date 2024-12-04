@@ -37,7 +37,7 @@
     </button>
     <button class="btn btn-secondary simple-round-button hover-color-change hover-border-change">
         <img src="{{ url_for('static', filename='images/addAttachment.png') }}" alt="Add Attachment" style="width: 36px; height: 36px;">
-        <input type="file" multiple/>
+        <input type="file" name="uploadedFiles" multiple/>
     </button>
 
     <button class="btn btn-secondary simple-round-button hover-color-change hover-border-change">
@@ -74,6 +74,7 @@
 <a class="navbar-brand" href="{{ url_for('get_sessions') }}">
     <img src="{{ url_for('static', filename='images/historySessions.png') }}" width="24px" height="24px" alt="History Sessions">
 </a>
+
 <a class="navbar-brand navbar-text-container" href="{{ url_for('auth.logout') }}">
     <div class="navbar-text primary-font">
       {{ username }}
