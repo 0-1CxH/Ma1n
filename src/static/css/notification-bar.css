@@ -27,7 +27,7 @@
     color: white;
 }
 
-.page-notification-default {
-    background-color: rgba(128, 128, 128, 0.8);
+.page-notification-success {
+    background-color: rgba(15, 197, 112, 0.874);
     color: white;
 }

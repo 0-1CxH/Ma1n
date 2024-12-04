@@ -1,6 +1,6 @@
 import uuid
 from flask import render_template, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 def register_main_routes(app):
 
@@ -21,7 +21,9 @@ def register_main_routes(app):
     @app.route('/list-sessions')
     @login_required
     def get_sessions():
-        return render_template('history.html')
+        username = current_user.get_id()
+
+        return render_template('history.html', username=username)
 
     @app.route('/submit-session', methods=['POST'])
     def submit_all_and_get_session_id():

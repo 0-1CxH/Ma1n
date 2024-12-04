@@ -92,3 +92,16 @@
 .login-input-textbox {
   border: 1px solid grey;
 }
+
+.navbar-text {
+  font-size: large;
+  color: black;
+  margin-left: 10px;
+}
+
+.navbar-text-container {
+  background-color: #ccc;
+  border-radius: 8px;
+  padding-left: 10px;
+  padding-right: 15px;
+}
