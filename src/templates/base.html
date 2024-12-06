@@ -36,11 +36,11 @@
     
     <div class="main-content-container d-flex align-items-center justify-content-center">
 
-        {% if use_wider %}
-        <div class="main-content-wider">
-            {% block pageMainContentWider %}
+        {% if use_not_wrapped %}
+        
+            {% block pageMainContentNotWrapped %}
             {% endblock %}
-        </div>
+
         {% else %}
         <div class="main-content">
             <!-- Main Content of this Page  -->
@@ -56,7 +56,7 @@
     </div>
 
     <!-- Navigation Bar -->
-    <nav class="navbar fixed-top navbar-light buttom-nav-bar primary-font">
+    <nav class="navbar fixed-top navbar-light buttom-nav-bar primary-font d-flex">
         <div class="container-fluid d-flex justify-content-end">
             {% block navBarExtension %}
             {% endblock %}

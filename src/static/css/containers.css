@@ -26,7 +26,7 @@
 
 @media (max-width: 992px) {
   .main-content-wider {
-    width: 100%;
+    width: 100%; 
   }
 }
 
@@ -134,18 +134,39 @@
 }
 
 .node-item-card {
-  min-width: 30%;
+  /* width: 30%;
+  display: flex;
   max-height: 400px;
+  height: fit-content;
   overflow-y: scroll;
   border: 2px solid grey;
   border-radius: 8px;
-  margin: 1px;
+  margin: 1px;*/
+  width: 30vw;
+  max-width: 90vw;
+  display: flex;
+  height: 30vh;
+  max-height: 81vh;
   resize: both;
-  overflow: auto;
+  overflow: scroll; 
+  flex-shrink: 0;
+  flex-grow: 0; 
 }
 
 .node-cards-row-container {
-  max-height: 300px;
-  overflow-x: display;
-  resize: both;
+  /* max-height: 300px; */
+  /* overflow-x: visible;
+  flex-wrap: wrap;
+  resize: both; */
+  display: flex;
+  overflow-x: scroll;
+  flex-shrink: 0;
+  flex-grow: 0; 
+}
+
+.all-rows-container {
+  margin-top: 8vh;
+  max-height: 90vh;
+  overflow-y: scroll;
+  border: 2px dashed grey;
 }

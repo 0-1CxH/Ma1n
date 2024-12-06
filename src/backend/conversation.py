@@ -60,7 +60,7 @@ class ConversationManager:
     '''
 
     query_session_by_id_sql = '''
-        SELECT conversation_folder 
+        SELECT owner_username, conversation_folder 
         FROM session_info 
         WHERE session_id = ?
     '''
@@ -71,6 +71,9 @@ class ConversationManager:
     '''
 
     abst_filename = "abst.json"
+    nodes_filename = "nodes.json"
+    input_material_folder_name = "input_material/"
+    output_material_folder_name = "output_material/"
 
     def __init__(self, session_db_path: str, conversation_store_root: str) -> None:
         if ConversationManager.conversation_manager_instance is not None:
@@ -80,9 +83,8 @@ class ConversationManager:
         sqlite_connect_and_execute(self.session_db_path, self.create_table_sql)
         ConversationManager.user_manager_instance = self
     
-
-    
-    def add_conversation_info(self, session_id, owner_username, conversation_folder):
+    def add_conversation_info(self, session_id, owner_username, all_submitted_content):
+        conversation_folder = os.path.join(self.conversation_store_root, owner_username, session_id)
         # build folder and insert to db 
         sqlite_connect_and_execute(
             self.session_db_path,
@@ -90,12 +92,13 @@ class ConversationManager:
             args=(session_id, owner_username, conversation_folder)
         )
         os.makedirs(conversation_folder)
-    
-    def add_conversation_abstract(self, conversation_folder, title, note):
-        # save abst to folder
+        
+        # save abst file to folder
         abst_file_path = os.path.join(conversation_folder, self.abst_filename)
+        title = all_submitted_content["user_input"][:50]
         if len(title) == 0:
             title = "(No Title for Now, will Generate Soon)"
+        note = f'{all_submitted_content["selected_process_function"]} of {len(all_submitted_content["uploaded_files"])} file(s) and {len(all_submitted_content["entered_links"])} link(s)'
         conv_abst = ConversationAbstract(
             title=title,
             ctime=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -103,28 +106,68 @@ class ConversationManager:
             note=note,
         )
         conv_abst.to_file(abst_file_path)
+
+        # process the files and links
+        
+        # save nodes file to folder
+        nodes_file_path = os.path.join(conversation_folder, self.nodes_filename)
+        with open(nodes_file_path, "w") as f:
+            f.write(json.dumps({}, ensure_ascii=False, indent=4))
+        
+
     
     def get_conversation_abstract(self, conversation_folder):
         # get abst from folder
         abst_file_path = os.path.join(conversation_folder, self.abst_filename)
         return ConversationAbstract.from_file(abst_file_path)
-        
-
     
-    def delete_conversation_info(self, session_id):
-        # delete folder (including abst, inpt, otpt and everything) and remove from db
-        row = sqlite_connect_and_execute(
+
+    def get_session_info_by_id(self, session_id, username):
+        owner, conv_folder = sqlite_connect_and_execute(
             self.session_db_path, 
             self.query_session_by_id_sql,
             args=(session_id,),
             fetch="one"
         )
-        sqlite_connect_and_execute(
-            self.session_db_path,
-            self.delete_session_sql,
-            args=(session_id,)
+        if owner == username:
+            conv_nodes_file = os.path.join(conv_folder, self.nodes_filename)
+            try:
+                with open(conv_nodes_file) as f:
+                    conv_nodes_file_content = json.loads(f.read())
+                    return {
+                        "code": 0, 
+                        "conv_folder": conv_folder, 
+                        "conv_nodes_file_content": conv_nodes_file_content
+                    }
+            except Exception as e:
+                return {"code": -2, "reason": e.__str__()}
+
+        else:
+            return {"code": -1, "reason": "No Permission."}
+
+
+    
+    def delete_conversation_info(self, session_id, username):
+        # delete folder (including abst, inpt, otpt and everything) and remove from db
+        owner, conv_folder = sqlite_connect_and_execute(
+            self.session_db_path, 
+            self.query_session_by_id_sql,
+            args=(session_id,),
+            fetch="one"
         )
-        shutil.rmtree(row[0])
+        if owner == username:
+            sqlite_connect_and_execute(
+                self.session_db_path,
+                self.delete_session_sql,
+                args=(session_id,)
+            )
+            try:
+                shutil.rmtree(conv_folder)
+                return {"code": 0}
+            except:
+                return {"code": ret_code, "reason": "File Already Deleted."}
+        else:
+            return {"code": -1, "reason": "No Permission."}
 
     
     def get_conversations_by_username(self, username):

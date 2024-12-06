@@ -2,6 +2,7 @@ import uuid
 import os
 from flask import render_template, request, url_for, request
 from flask_login import login_required, current_user
+from ..intelligence.constants import supported_process_functions
 
 
 def register_main_routes(app, conversation_manager):
@@ -15,12 +16,7 @@ def register_main_routes(app, conversation_manager):
 
     @app.route('/get-process-funcs')
     def get_all_process_functions():
-        process_functions = [
-            "Process",
-            "Process Very Long Name For Test",
-            "Other Funcs"
-        ]
-        return {"data": process_functions}
+        return {"data": supported_process_functions}
 
     @app.route('/list-sessions')
     @login_required
@@ -34,9 +30,7 @@ def register_main_routes(app, conversation_manager):
     def submit_all_and_get_session_id():
         random_session_id = str(uuid.uuid4())
         username = current_user.username
-        filepath = os.path.join(conversation_manager.conversation_store_root, username, random_session_id)
-        conversation_manager.add_conversation_info(session_id=random_session_id, owner_username=username, conversation_folder=filepath)
-
+        
         user_input = request.form.get('userInput', "")
         uploaded_files = request.files.getlist('uploadedFiles')
         if uploaded_files is None:
@@ -49,10 +43,17 @@ def register_main_routes(app, conversation_manager):
         selected_process_function = request.form.get('selectedProcessFunction', "")
 
         # print(f"{user_input=}, {uploaded_files=}, {entered_links=}, {selected_process_function=}")
-        conversation_manager.add_conversation_abstract(
-            conversation_folder=filepath, 
-            title = user_input[:50],
-            note = f"{selected_process_function} of {len(uploaded_files)} file(s) and {len(entered_links)} link(s)"
+        # print(f"{type(uploaded_files[0])}")
+
+        conversation_manager.add_conversation_info(
+            session_id=random_session_id,
+            owner_username=username,
+            all_submitted_content={
+                "user_input": user_input,
+                "uploaded_files": uploaded_files,
+                "entered_links": entered_links,
+                "selected_process_function": selected_process_function
+            }
         )
         return {"sessionId": random_session_id}
 
@@ -61,10 +62,21 @@ def register_main_routes(app, conversation_manager):
     def fetch_session_by_id():
         session_id = request.args.get('id')
         username = current_user.username
-        return render_template('conversation.html', username=username, )
+        ret_dict = conversation_manager.get_session_info_by_id(session_id, username)
+        if ret_dict["code"] == 0:
+            return render_template(
+                'conversation.html', 
+                username=username,
+                conv_folder=ret_dict["conv_folder"],
+                conv_nodes_file_content=ret_dict["conv_nodes_file_content"],
+            )
+        else:
+            return ret_dict
+
     
     @app.route('/delete-session')
     def delete_session_by_id():
         session_id = request.args.get('id')
-        conversation_manager.delete_conversation_info(session_id)
-        return {"sessionId": session_id}
+        username = current_user.username
+        return conversation_manager.delete_conversation_info(session_id, username)
+
