@@ -36,11 +36,19 @@
     
     <div class="main-content-container d-flex align-items-center justify-content-center">
 
+        {% if use_wider %}
+        <div class="main-content-wider">
+            {% block pageMainContentWider %}
+            {% endblock %}
+        </div>
+        {% else %}
         <div class="main-content">
             <!-- Main Content of this Page  -->
             {% block pageMainContent %}
             {% endblock %}
         </div>
+        {% endif %}
+
 
         <div id="content"></div>
 

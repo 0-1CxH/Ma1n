@@ -15,3 +15,39 @@
   <img src="{{ url_for('static', filename='images/decline.png') }}" width="24px" height="24px" alt="Logout">
 </a>
 {% endblock %}
+
+{% set use_wider=True %}
+
+{% block pageMainContentWider %}
+
+
+<div class="node-cards-row-container d-flex">
+  {% for i in range(5) %}
+  <div class="card node-item-card">
+    <img class="card-img-top" src="..." alt="Card image cap">
+    <div class="card-body">
+      <h5 class="card-title">Card title that wraps to a new l a new line Card title that wraps to a new line Card title that wraps to a new line</h5>
+      <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+      <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+        <label class="form-check-label" for="inlineCheckbox1">1</label>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  <div class="card node-item-card">
+    <div class="card-body">
+      <h5 class="card-title"></h5>
+      <p class="card-text">This .</p>
+      <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+        <label class="form-check-label" for="inlineCheckbox1">1</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
