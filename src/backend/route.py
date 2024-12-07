@@ -43,7 +43,8 @@ def register_main_routes(app, conversation_manager):
         selected_process_function = request.form.get('selectedProcessFunction', "")
 
         # print(f"{user_input=}, {uploaded_files=}, {entered_links=}, {selected_process_function=}")
-        # print(f"{type(uploaded_files[0])}")
+        print(f"{type(uploaded_files[0])}, {uploaded_files[0].filename=}, {uploaded_files[0].mimetype=}")
+        # uploaded_files[0].save("./testfilesave")
 
         conversation_manager.add_conversation_info(
             session_id=random_session_id,

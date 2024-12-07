@@ -38,6 +38,19 @@ class SessionInfo:
     session_id: str
 
 
+@dataclass
+class NodeContent:
+    content_type: str # M[material], D[dialog]
+    io_type: str # I[input], O[output]
+    title: str
+    note: str
+    level: int
+    cap_img_path: str = None
+
+
+
+
+
 class ConversationManager:
     conversation_manager_instance = None
 
