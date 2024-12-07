@@ -1,8 +1,12 @@
 import os
 import json
 import shutil
+import uuid
+import wget
 import datetime
+import requests
 from dataclasses import dataclass
+from typing import List
 from .sqlite_utils import sqlite_connect_and_execute
 
 
@@ -39,15 +43,45 @@ class SessionInfo:
 
 
 @dataclass
-class NodeContent:
-    content_type: str # M[material], D[dialog]
-    io_type: str # I[input], O[output]
-    title: str
-    note: str
+class ContentNode:
+    node_id: str
     level: int
+    valid: bool
+    node_type: str # M[material], A[artifact], I[instruction], R[response]
+    name: str
+    mime_type: str = None
+    note: str = None
+    related_file_path: str = None
     cap_img_path: str = None
 
+@dataclass
+class ContentEdge:
+    source_node_id: str
+    target_node_id: str
 
+@dataclass
+class ConversationNodes:
+    nodes: List[ContentNode]
+    edges: List[ContentEdge]
+
+    def get_max_level(self):
+        return max([node.level for node in self.nodes])
+    
+    def to_file(self, nodes_file):
+        with open(nodes_file, "w") as f:
+            json.dump({
+                "nodes": [n.__dict__ for n in self.nodes],
+                "edges": [e.__dict__ for e in self.edges]
+            }, f, ensure_ascii=False)
+    
+    @classmethod
+    def from_file(cls, nodes_file):
+        if not os.path.exists(nodes_file):
+            return None
+        with open(nodes_file) as f:
+            return cls(**json.load(f))
+
+    
 
 
 
@@ -120,12 +154,77 @@ class ConversationManager:
         )
         conv_abst.to_file(abst_file_path)
 
+        # create nodes
+        all_content_nodes = []
+
+        # add user input first
+        all_content_nodes.append(ContentNode(
+            node_id = str(uuid.uuid4()),
+            level = 0,
+            valid = True,
+            node_type = "I",
+            name = all_submitted_content["user_input"],
+            note = all_submitted_content["selected_process_function"],
+        ))
+
         # process the files and links
+        input_material_folder = os.path.join(conversation_folder, self.input_material_folder_name)
+        os.makedirs(input_material_folder)
+        os.makedirs(os.path.join(conversation_folder, self.output_material_folder_name))
+        for upfile in all_submitted_content["uploaded_files"]:
+            save_upfile_path = os.path.join(input_material_folder, upfile.filename)
+            try:
+                upfile.save(save_upfile_path)
+                all_content_nodes.append(ContentNode(
+                    node_id = str(uuid.uuid4()),
+                    level = 0,
+                    valid = True,
+                    node_type = "M",
+                    name = upfile.filename,
+                    mime_type = upfile.mimetype,
+                    note = "from uploaded file",
+                    related_file_path = save_upfile_path,
+                ))
+            except Exception as e:
+                all_content_nodes.append(ContentNode(
+                    node_id = str(uuid.uuid4()),
+                    level = 0,
+                    valid = False,
+                    node_type = "M",
+                    name = upfile.filename,
+                    note = f"File save error: {upfile.__str__()} ; The reason is {e.__str__()}"
+                ))
+        
+        for elink in all_submitted_content["entered_links"]:
+            try:
+                response = requests.head(elink)
+                file_save_name = wget.download(elink, input_material_folder)
+                all_content_nodes.append(ContentNode(
+                    node_id = str(uuid.uuid4()),
+                    level = 0,
+                    valid = True,
+                    node_type = "M",
+                    name = os.path.basename(file_save_name),
+                    mime_type = response.headers.get('Content-Type'),
+                    note = f"download with link {elink}",
+                    related_file_path = file_save_name,
+                ))
+            except Exception as e:
+                all_content_nodes.append(ContentNode(
+                    node_id = str(uuid.uuid4()),
+                    level = 0,
+                    valid = False,
+                    node_type = "M",
+                    name = "link",
+                    note = f"Link parse error: {elink} ; The reason is {e.__str__()}"
+                ))
+
         
         # save nodes file to folder
         nodes_file_path = os.path.join(conversation_folder, self.nodes_filename)
         with open(nodes_file_path, "w") as f:
-            f.write(json.dumps({}, ensure_ascii=False, indent=4))
+            nodes_obj = ConversationNodes(nodes=all_content_nodes, edges=[])
+            nodes_obj.to_file(nodes_file_path)
         
 
     
