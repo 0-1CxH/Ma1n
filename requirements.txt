@@ -2,3 +2,4 @@ flask
 python-dotenv
 flask-login
 wget
+flask-socketio

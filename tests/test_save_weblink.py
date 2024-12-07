@@ -22,7 +22,7 @@ url = 'https://www.cs.ucr.edu/~cshelton/cppsem/simpmat.cc'
 
 url = 'https://arxiv.org/pdf/2412.01253'
 
-filename = wget.download(url, out="tmp")
+filename = wget.download(url, out="tmp", bar=lambda current_size, total_size, width: print(current_size, total_size, width))
 print(filename)
 
 response = requests.head(url)

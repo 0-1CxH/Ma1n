@@ -7,6 +7,7 @@ import datetime
 import requests
 from dataclasses import dataclass
 from typing import List
+from flask_socketio import emit
 from .sqlite_utils import sqlite_connect_and_execute
 
 
@@ -130,7 +131,7 @@ class ConversationManager:
         sqlite_connect_and_execute(self.session_db_path, self.create_table_sql)
         ConversationManager.user_manager_instance = self
     
-    def add_conversation_info(self, session_id, owner_username, all_submitted_content):
+    def add_conversation_info(self, session_id, owner_username, all_submitted_content, socketio):
         conversation_folder = os.path.join(self.conversation_store_root, owner_username, session_id)
         # build folder and insert to db 
         sqlite_connect_and_execute(
@@ -156,6 +157,8 @@ class ConversationManager:
 
         # create nodes
         all_content_nodes = []
+        num_nodes_to_create = 2 + len(all_submitted_content["uploaded_files"]) + len(all_submitted_content["entered_links"])
+        num_nodes_created = 0
 
         # add user input first
         all_content_nodes.append(ContentNode(
@@ -166,12 +169,22 @@ class ConversationManager:
             name = all_submitted_content["user_input"],
             note = all_submitted_content["selected_process_function"],
         ))
+        num_nodes_created += 1
+        socketio.emit('main_submit_progress_update', 
+            {'current': num_nodes_created, 'total': num_nodes_to_create,
+            'message': f'Start processing user instruction content node.', "level": "info"}
+        )
 
         # process the files and links
         input_material_folder = os.path.join(conversation_folder, self.input_material_folder_name)
         os.makedirs(input_material_folder)
         os.makedirs(os.path.join(conversation_folder, self.output_material_folder_name))
         for upfile in all_submitted_content["uploaded_files"]:
+            num_nodes_created += 1
+            socketio.emit('main_submit_progress_update', 
+                {'current': num_nodes_created, 'total': num_nodes_to_create,
+                'message': f'Start processing material node: {upfile.filename} ', "level": "info"}
+            )
             save_upfile_path = os.path.join(input_material_folder, upfile.filename)
             try:
                 upfile.save(save_upfile_path)
@@ -194,11 +207,25 @@ class ConversationManager:
                     name = upfile.filename,
                     note = f"File save error: {upfile.__str__()} ; The reason is {e.__str__()}"
                 ))
+                socketio.emit('main_submit_progress_update', 
+                    {'current': num_nodes_created, 'total': num_nodes_to_create,
+                    'message': f"File save error: {upfile.__str__()} ; The reason is {e.__str__()}",
+                    "level": "error"}
+                )
         
         for elink in all_submitted_content["entered_links"]:
+            num_nodes_created += 1
+            socketio.emit('main_submit_progress_update', 
+                {'current': num_nodes_created, 'total': num_nodes_to_create,
+                'message': f'Start processing material node: {elink} ', "level": "info"}
+            )
             try:
                 response = requests.head(elink)
-                file_save_name = wget.download(elink, input_material_folder)
+                file_save_name = wget.download(
+                    url=elink, 
+                    out=input_material_folder, 
+                    bar=lambda current_size, total_size, width: socketio.emit('main_submit_progress_update', {'current': num_nodes_created + 1.0 * current_size/ total_size, 'total': num_nodes_to_create, 'message': "none"})
+                )
                 all_content_nodes.append(ContentNode(
                     node_id = str(uuid.uuid4()),
                     level = 0,
@@ -218,6 +245,11 @@ class ConversationManager:
                     name = "link",
                     note = f"Link parse error: {elink} ; The reason is {e.__str__()}"
                 ))
+                socketio.emit('main_submit_progress_update', 
+                    {'current': num_nodes_created, 'total': num_nodes_to_create,
+                    'message': f"Link parse error: {elink} ; The reason is {e.__str__()}",
+                    "level": "error"}
+                )
 
         
         # save nodes file to folder

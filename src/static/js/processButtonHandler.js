@@ -33,9 +33,9 @@ function mainSubmit() {
     formData.append('selectedProcessFunction', getSelectedProcessFunction());
 
     // debug
-    for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-    }
+    // for (let [key, value] of formData.entries()) {
+    //     console.log(`${key}: ${value}`);
+    // }
 
     fetch(submit_session_url, {
         method: 'POST',
@@ -43,13 +43,13 @@ function mainSubmit() {
     })
     .then(response => {
         if (!response.ok) {
-            console.log('Network response was not ok');
+            addNotification('Network response not ok', "error");
         }
         return response.json();
     })
     .then(data => {
         addNotification('Session submitted successfully! Session ID: ' + data.sessionId, 'success');
-        console.log('Form submission success:', data);
+        // console.log('Form submission success:', data);
         let sessionId = data.sessionId;
         window.location.href = `${fetch_session_url}?id=${sessionId}`;
     })

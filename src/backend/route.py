@@ -2,10 +2,13 @@ import uuid
 import os
 from flask import render_template, request, url_for, request
 from flask_login import login_required, current_user
+from flask_socketio import SocketIO
 from ..intelligence.constants import supported_process_functions
 
 
 def register_main_routes(app, conversation_manager):
+
+    socketio = SocketIO(app)
 
     @app.route('/')
     @login_required
@@ -53,7 +56,8 @@ def register_main_routes(app, conversation_manager):
                 "uploaded_files": uploaded_files,
                 "entered_links": entered_links,
                 "selected_process_function": selected_process_function
-            }
+            },
+            socketio=socketio
         )
         return {"sessionId": random_session_id}
 

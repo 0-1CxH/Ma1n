@@ -54,3 +54,8 @@
 .process-dropdown-menu-item {
   background-color: white;
 }
+
+.main-submit-progress {
+  background-color: black;
+  width: 0%;
+}

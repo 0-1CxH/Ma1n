@@ -20,6 +20,7 @@
 
 {% block jsExtensionOnStart %}
 <script src="{{ url_for('static', filename='js/marked.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
 {% endblock %}
 
 
@@ -57,7 +58,7 @@
 
 
 
-<div class="process-button-container d-flex justify-content-center">
+<div class="process-button-container d-flex justify-content-center" id="process-button-container">
         <div class="btn-group" role="group">
             <button type="button" id="main-process-button" class="btn btn-secondary primary-font-variant main-process-button hover-change-main-process"></button>
             <button type="button" id="main-process-dropdown-button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split main-process-dropdown-button hover-change-main-process" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -67,6 +68,10 @@
         </div>
 </div>
 
+
+<div class="progress main-submit-progress-container" id="main-submit-progress-container" >
+    <div class="progress-bar main-submit-progress" id="main-submit-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
 
 {% endblock %}
 
@@ -128,5 +133,27 @@
     });
 
 });
+
+const socket = io();
+
+socket.on('main_submit_progress_update', function(data) {
+    
+    const ProcessButtonContainer = document.getElementById('process-button-container');
+    if(ProcessButtonContainer != null){
+        ProcessButtonContainer.remove();
+    }
+    
+    const progressBarContainer = document.getElementById('main-submit-progress-container');
+    progressBarContainer.style.backgroundColor = "#eee";
+    progressBarContainer.style.marginTop = "5vh";
+    const progressBar = document.getElementById('main-submit-progress'); 
+    progressBar.style.width = `${(data.current / data.total) * 100}%`;
+    if(data.message != "none"){
+        addNotification(`${data.message} (${data.current}/${data.total-1})`, data.level)
+    }
+    
+});
+
+
 </script>
 {% endblock %}

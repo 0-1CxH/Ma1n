@@ -170,3 +170,9 @@
   overflow-y: scroll;
   border: 2px dashed grey;
 }
+
+.main-submit-progress-container {
+  background-color: white;
+  margin-left: 10vw;
+  margin-right: 10vw;
+}
