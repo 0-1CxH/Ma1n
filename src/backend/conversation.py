@@ -239,7 +239,8 @@ class ConversationManager:
             try:
                 conv_nodes_file_content = ConversationFolderStructure.get_conv_nodes_obj(conv_folder, ret="dict")
                 return {
-                    "code": 0, 
+                    "code": 0,
+                    "is_owner": owner == username,
                     "conv_folder": conv_folder, 
                     "conv_nodes_file_content": conv_nodes_file_content
                 }

@@ -53,6 +53,13 @@ function toggleNodeSelectionForLevel(level) {
     }
 }
 
+function hideProgressBar() {
+    const convSubmitProgressContainer = document.getElementById('conv-submit-progress-container');
+    convSubmitProgressContainer.style.height = "0";
+    convSubmitProgressContainer.style.marginTop = "0";
+    convSubmitProgressContainer.style.marginButtom = "0";
+}
+
 function showInputBox() {
     const mainInputEditor = document.getElementById("main-input-editor");
     mainInputEditor.innerHTML = `
@@ -73,10 +80,7 @@ function showInputBox() {
     const allRowsContainer = document.getElementById('all-rows-container');
     allRowsContainer.style.maxHeight = "75vh";
     allRowsContainer.style.height = "auto";
-    const convSubmitProgressContainer = document.getElementById('conv-submit-progress-container');
-    convSubmitProgressContainer.style.height = "0";
-    convSubmitProgressContainer.style.marginTop = "0";
-    convSubmitProgressContainer.style.marginButtom = "0";
+   
 
 
 }

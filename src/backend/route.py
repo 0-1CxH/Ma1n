@@ -73,6 +73,7 @@ def register_main_routes(app, conversation_manager):
             return render_template(
                 'conversation.html', 
                 username=current_user.username,
+                is_owner = ret_dict["is_owner"],
                 session_id=session_id,
                 conv_folder=ret_dict["conv_folder"],
                 conv_nodes_file_content=ret_dict["conv_nodes_file_content"],

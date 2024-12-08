@@ -1,3 +1,4 @@
+import uuid
 from ..backend.defines import ConversationAbstract, ConversationNodes, ContentNode, ContentEdge
 
 class IntelligenceManger:
@@ -22,7 +23,7 @@ class IntelligenceManger:
         if self.conv_nodes_obj.get_max_level() < 10:
             self.conv_abst_obj.title = f"Mock of {self.conv_nodes_obj.get_max_level()}"
             mock_response = ContentNode(
-                node_id = "aa",
+                node_id = str(uuid.uuid4()),
                 level = self.conv_nodes_obj.get_max_level() + 1,
                 valid=True,
                 node_type="R",
@@ -31,7 +32,7 @@ class IntelligenceManger:
             )
             self.conv_nodes_obj.nodes.append(mock_response)
             mock_artiface = ContentNode(
-                node_id = "bb",
+                node_id = str(uuid.uuid4()),
                 level = self.conv_nodes_obj.get_max_level(),
                 valid=True,
                 node_type="A",
