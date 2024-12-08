@@ -30,6 +30,17 @@
     border: 1px solid grey;
   }
 
+  .bigger-round-button {
+    border-radius: 8px;
+    margin-left: 4px;
+    height: 48px;
+    width: 64px;
+    padding: 0;
+    position: relative;
+    background-color: white;
+    border: 2px solid grey;
+  }
+
   .main-process-button {
     background-color: black;
     border-radius: 8px;

@@ -39,7 +39,7 @@
   <div class="session-list-container align-items-center justify-items-center">
       {% for sess_info in all_session_info %}
       <div class="d-flex session-list-item" id="session-list-item-{{ sess_info.session_id }}">
-      <a href="{{ url_for('fetch_session_by_id') }}?id={{ sess_info.session_id }}"
+      <a href="{{ url_for('fetch_session_by_id') }}?id={{ sess_info.session_id }}&step=1"
               class="list-group-item list-group-item-action flex-column align-items-start primary-font" style="border: none;">
             <div class="d-flex w-100 justify-content-between">
               <h5 class="mb-1">{{ sess_info.conv_abst.title | safe }}</h5>

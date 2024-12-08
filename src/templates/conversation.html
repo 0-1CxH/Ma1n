@@ -1,5 +1,24 @@
 {% extends "base.html" %}
 
+{% block initUrls %}
+<script>
+    const take_step_url = "{{ url_for('take_intelligence_step_by_id') }}";
+    const fetch_session_url = "{{ url_for('fetch_session_by_id') }}"
+</script>
+{% endblock %}
+
+{% block cssExtension %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/editors.css') }}">
+{% endblock %}
+
+{% block jsExtensionOnStart %}
+<script>
+  const currentSessionId = "{{ session_id }}"
+</script>
+<script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
+<script src="{{ url_for('static', filename='js/stepHandler.js') }}"></script>
+{% endblock %}
+
 {% block navBarExtension %}
 <a class="navbar-brand" href="{{ url_for('get_sessions') }}">
   <img src="{{ url_for('static', filename='images/historySessions.png') }}" width="24px" height="24px" alt="History Sessions">
@@ -19,49 +38,84 @@
 {% set use_not_wrapped=True %}
 
 {% block pageMainContentNotWrapped %}
-<div class="container-fluid" style="width: 100%;">
+<!-- <div class="container-fluid" style="width: 100%;"> -->
 
+  <div class="main-content-wider">
 
-  <div class="all-rows-container">
+  <div class="all-rows-container" id="all-rows-container">
+  <!-- {% for debug_repeat in range(1) %} -->
+    {% for level in range(conv_nodes_file_content.max_node_level + 1) %}
+    <div id="node-cards-row-container-level-{{ level }}" 
+      class="node-cards-row-container d-flex my-2" 
+      onclick="if (event.target === this) { toggleNodeSelectionForLevel('{{ level }}'); }">
+        {% for node in conv_nodes_file_content.nodes if node.level == level %}
+            <div id="node-item-card-{{ node.node_id }}" 
+            class="card node-item-card flex-grow-1 m-2"
+            onclick="toggleNodeSelection('{{ node.node_id }}')">
 
-    {% for j in range(3) %}
-      <div class="node-cards-row-container d-flex my-2">
-          {% for i in range(j, 5) %}
-          <div class="card node-item-card flex-grow-1 m-2">
-            <!-- <img class="card-img-top" src="..." alt="Card image cap"> -->
-            <div class="card-body">
-              <div class="d-flex">
-                <h5 class="card-title">Card title that wraps to a new l a new line Card title that wraps to a new line Card title that wraps to a new line</h5>
+              <div class="card-body">
 
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-                  <label class="form-check-label" for="inlineCheckbox1">1</label>
+                <h5 class="card-title">{{ node.name }}</h5>
+                <div class="btn-group" role="group" aria-label="Node Actions">
+                  <button type="button" class="btn btn-secondary">Expand</button>
+                  <button type="button" class="btn btn-secondary">Copy</button>
+                  <button type="button" class="btn btn-secondary">Reset</button>
                 </div>
+                <p class="card-text">{{ node }}</p>
+              
+              </div>
                 
-              </div>
-              
-              <button class="btn">Expand</button>
-              
-              <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-
             </div>
-          </div>
-          {% endfor %}
-          <!-- <div class="card node-item-card flex-grow-1">
-            <div class="card-body">
-              <h5 class="card-title"></h5>
-              <p class="card-text">This .</p>
-              <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-                <label class="form-check-label" for="inlineCheckbox1">1</label>
-              </div>
-            </div>
-          </div> -->
-      </div>
+        {% endfor %}
+    </div>
     {% endfor %}
-
+    <!-- {% endfor %} -->
   </div>
 
+
+  <div id="main-input-editor" class="editor-container primary-font"></div>
+
 </div>
+{% endblock %}
+
+{% block jsExtensionOnEnd %}
+<script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    showInputBox();
+  });
+</script>
+
+{% if call_step_when_load %}
+<script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    stepSubmit(false);
+  });
+</script>
+{% endif %}
+
+
+<script>
+
+  const socket = io();
+
+  socket.on('intelligence_step_progress_update', function(data) {
+      
+      // const ProcessButtonContainer = document.getElementById('process-button-container');
+      // if(ProcessButtonContainer != null){
+      //     ProcessButtonContainer.remove();
+      // }
+      
+      // const progressBarContainer = document.getElementById('main-submit-progress-container');
+      // progressBarContainer.style.backgroundColor = "#eee";
+      // progressBarContainer.style.marginTop = "5vh";
+      // const progressBar = document.getElementById('main-submit-progress'); 
+      // progressBar.style.width = `${(data.current / data.total) * 100}%`;
+      // if(data.message != "none"){
+      //     addNotification(`${data.message} (${data.current}/${data.total-1})`, data.level)
+      // }
+      
+  });
+</script>
+
+
 {% endblock %}

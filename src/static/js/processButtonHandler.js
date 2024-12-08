@@ -43,9 +43,11 @@ function mainSubmit() {
     })
     .then(response => {
         if (!response.ok) {
-            addNotification('Network response not ok', "error");
+            addNotification(`Session deletion has encoutered error, status code=${response.status}: ${response.statusText}`, 'error')
         }
-        return response.json();
+        else{
+            return response.json();
+        }
     })
     .then(data => {
         addNotification('Session submitted successfully! Session ID: ' + data.sessionId, 'success');

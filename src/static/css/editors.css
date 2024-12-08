@@ -23,7 +23,14 @@
     border-left: 1px solid #ccc;
     width: 50%;
 }
-  
+
+.buttom-editor {
+    overflow: auto;
+    padding: 10px;
+    border: 2px solid grey;
+    height: 12vh;
+  }
+
 .full-width-text-editor {
     border-radius: 8px;
     border: solid 2px grey;

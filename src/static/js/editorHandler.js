@@ -14,9 +14,12 @@ function setEditorMode(mode) {
 
 function renderEditor() {
     const mainInputEditor = document.getElementById("main-input-editor");
+    const editorPlaceHolder = `Text in your instructions` + 
+    `, and upload files or enter web links if you need. ` + 
+    `Current editor mode: ${currentEditorMode}, click the button to switch.`
     if (currentEditorMode === "plain") {
         mainInputEditor.innerHTML = `
-            <textarea class="base-editor full-width-text-editor""></textarea>
+            <textarea class="base-editor full-width-text-editor" placeholder="${editorPlaceHolder}"></textarea>
         `;
         // adaptive height
         const inputDiv = mainInputEditor.querySelector(".full-width-text-editor");
@@ -28,7 +31,7 @@ function renderEditor() {
     } else if (currentEditorMode === "markdown") {
         mainInputEditor.innerHTML = `
         <div class="d-flex">
-            <textarea class="base-editor half-width-text-input-left"></textarea>
+            <textarea class="base-editor half-width-text-input-left" placeholder="${editorPlaceHolder}"></textarea>
             <div class="base-editor half-width-text-output-right""></div>
         </div>
         `;

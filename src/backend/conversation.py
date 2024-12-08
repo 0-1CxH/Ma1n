@@ -10,6 +10,7 @@ from typing import List
 from flask_socketio import emit
 from .sqlite_utils import sqlite_connect_and_execute
 
+from ..intelligence.execute import IntelligenceManger
 
 @dataclass
 class ConversationAbstract:
@@ -20,7 +21,7 @@ class ConversationAbstract:
 
     def to_file(self, abst_file):
         with open(abst_file, "w") as f:
-            json.dump(self.__dict__, f, ensure_ascii=False)
+            json.dump(self.__dict__, f, ensure_ascii=False, indent=4)
     
     @classmethod
     def from_file(cls, abst_file):
@@ -54,6 +55,7 @@ class ContentNode:
     note: str = None
     related_file_path: str = None
     cap_img_path: str = None
+    intelligence_processed: bool = False
 
 @dataclass
 class ContentEdge:
@@ -72,17 +74,9 @@ class ConversationNodes:
         with open(nodes_file, "w") as f:
             json.dump({
                 "nodes": [n.__dict__ for n in self.nodes],
-                "edges": [e.__dict__ for e in self.edges]
-            }, f, ensure_ascii=False)
-    
-    @classmethod
-    def from_file(cls, nodes_file):
-        if not os.path.exists(nodes_file):
-            return None
-        with open(nodes_file) as f:
-            return cls(**json.load(f))
-
-    
+                "edges": [e.__dict__ for e in self.edges],
+                "max_node_level": self.get_max_level(),
+            }, f, ensure_ascii=False, indent=4)
 
 
 
@@ -120,8 +114,8 @@ class ConversationManager:
 
     abst_filename = "abst.json"
     nodes_filename = "nodes.json"
-    input_material_folder_name = "input_material/"
-    output_material_folder_name = "output_material/"
+    input_material_folder_name = "input_material"
+    output_material_folder_name = "output_material"
 
     def __init__(self, session_db_path: str, conversation_store_root: str) -> None:
         if ConversationManager.conversation_manager_instance is not None:
@@ -231,9 +225,9 @@ class ConversationManager:
                     level = 0,
                     valid = True,
                     node_type = "M",
-                    name = os.path.basename(file_save_name),
+                    name = elink, 
                     mime_type = response.headers.get('Content-Type'),
-                    note = f"download with link {elink}",
+                    note = f"download with link {elink} save as {os.path.basename(file_save_name)}",
                     related_file_path = file_save_name,
                 ))
             except Exception as e:
@@ -242,7 +236,7 @@ class ConversationManager:
                     level = 0,
                     valid = False,
                     node_type = "M",
-                    name = "link",
+                    name = elink,
                     note = f"Link parse error: {elink} ; The reason is {e.__str__()}"
                 ))
                 socketio.emit('main_submit_progress_update', 
@@ -310,6 +304,27 @@ class ConversationManager:
                 return {"code": 0}
             except:
                 return {"code": ret_code, "reason": "File Already Deleted."}
+        else:
+            return {"code": -1, "reason": "No Permission."}
+    
+    def take_intelligence_step(self, session_id, username, selected_node_ids, user_input):
+        owner, conv_folder = sqlite_connect_and_execute(
+            self.session_db_path, 
+            self.query_session_by_id_sql,
+            args=(session_id,),
+            fetch="one"
+        )
+        if owner == username:
+            im = IntelligenceManger(conv_folder)
+            im.step(selected_node_ids, user_input)
+            conv_nodes_file = os.path.join(conv_folder, self.nodes_filename)
+            with open(conv_nodes_file) as f:
+                conv_nodes_file_content = json.loads(f.read())
+                return {
+                    "code": 0, 
+                    "conv_folder": conv_folder, 
+                    "conv_nodes_file_content": conv_nodes_file_content,
+                }
         else:
             return {"code": -1, "reason": "No Permission."}
 

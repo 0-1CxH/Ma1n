@@ -129,6 +129,7 @@
   word-break: break-all;
   border: 1px dashed grey; 
   margin: 2px; 
+  border-radius: 8px;
   overflow-y: auto;
   width: 99%;
 }
@@ -139,14 +140,15 @@
   max-height: 400px;
   height: fit-content;
   overflow-y: scroll;
-  border: 2px solid grey;
-  border-radius: 8px;
   margin: 1px;*/
   width: 30vw;
-  max-width: 90vw;
+  max-width: 81vw;
+  min-width: 200px;
+  border: 1px dashed grey;
+  border-radius: 8px;
   display: flex;
   height: 30vh;
-  max-height: 81vh;
+  max-height: 72vh;
   resize: both;
   overflow: scroll; 
   flex-shrink: 0;
@@ -162,13 +164,17 @@
   overflow-x: scroll;
   flex-shrink: 0;
   flex-grow: 0; 
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
 
 .all-rows-container {
-  margin-top: 8vh;
+  margin-top: 10vh;
+  margin-bottom: 10px;
   max-height: 90vh;
   overflow-y: scroll;
-  border: 2px dashed grey;
+  border: 2px dashed black;
+  border-radius: 8px;
 }
 
 .main-submit-progress-container {

@@ -16,7 +16,6 @@ def register_main_routes(app, conversation_manager):
         username = current_user.username
         return render_template('index.html', username=username)
 
-
     @app.route('/get-process-funcs')
     def get_all_process_functions():
         return {"data": supported_process_functions}
@@ -65,14 +64,21 @@ def register_main_routes(app, conversation_manager):
     @login_required
     def fetch_session_by_id():
         session_id = request.args.get('id')
+        call_step_when_load = request.args.get('step')
+        if call_step_when_load == "0":
+            call_step_when_load = False
+        else:
+            call_step_when_load = True
         username = current_user.username
         ret_dict = conversation_manager.get_session_info_by_id(session_id, username)
         if ret_dict["code"] == 0:
             return render_template(
                 'conversation.html', 
                 username=username,
+                session_id=session_id,
                 conv_folder=ret_dict["conv_folder"],
                 conv_nodes_file_content=ret_dict["conv_nodes_file_content"],
+                call_step_when_load=call_step_when_load,
             )
         else:
             return ret_dict
@@ -83,4 +89,32 @@ def register_main_routes(app, conversation_manager):
         session_id = request.args.get('id')
         username = current_user.username
         return conversation_manager.delete_conversation_info(session_id, username)
+    
+    @app.route('/step', methods=['POST'])
+    def take_intelligence_step_by_id():
+        session_id = request.form.get('sessionId')
+        selected_node_ids = request.form.get('selectedNodes', None)
+        if selected_node_ids:
+            selected_node_ids = selected_node_ids.split(";")
+        user_input = request.form.get('userInput', None)
+        username = current_user.username
+        return conversation_manager.take_intelligence_step(
+            session_id, 
+            username,
+            selected_node_ids,
+            user_input
+        )
+        # if ret_dict["code"] == 0:
+        #     return render_template(
+        #         'conversation.html', 
+        #         username=username,
+        #         session_id=session_id,
+        #         conv_folder=ret_dict["conv_folder"],
+        #         conv_nodes_file_content=ret_dict["conv_nodes_file_content"],
+        #         call_step_when_load=False,
+        #     )
+        # else:
+        #     return ret_dict
+
+
 
