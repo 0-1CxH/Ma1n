@@ -46,19 +46,38 @@
     {% for level in range(conv_nodes_file_content.max_node_level + 1) %}
     <div id="node-cards-row-container-level-{{ level }}" 
       class="node-cards-row-container d-flex my-2" 
-      onclick="if (event.target === this) { toggleNodeSelectionForLevel('{{ level }}'); }">
+      onclick="if (event.target === this && !event.target.closest('.btn-group')) { toggleNodeSelectionForLevel('{{ level }}'); }">
         {% for node in conv_nodes_file_content.nodes if node.level == level %}
             <div id="node-item-card-{{ node.node_id }}" 
             class="card node-item-card flex-grow-1 m-2"
-            onclick="toggleNodeSelection('{{ node.node_id }}')">
+            onclick="toggleNodeSelection('{{ node.node_id }}');"
+            onmouseover="this.scrollIntoView({ behavior: 'smooth', inline: 'center' });"
+            >
 
               <div class="card-body">
 
                 <h5 class="card-title">{{ node.name }}</h5>
                 <div class="btn-group" role="group" aria-label="Node Actions">
-                  <button type="button" class="btn btn-secondary">Expand</button>
-                  <button type="button" class="btn btn-secondary">Copy</button>
-                  <button type="button" class="btn btn-secondary">Reset</button>
+                  <button type="button" class="btn simple-round-button"
+                    onclick="navigator.clipboard.writeText(this.closest('.card-body').querySelector('.card-text').innerText); 
+                      addNotification('Value copied to clipboard.', 'success');
+                      toggleNodeSelection('{{ node.node_id }}');
+                      ">
+                    <img src="{{ url_for('static', filename='images/copy.png') }}" alt="CopyValue" 
+                      style="width: 24px; height: 24px;">
+                  </button>
+                  <button type="button" class="btn simple-round-button"
+                    onclick="const card = this.closest('.node-item-card'); 
+                    card.style.width = card.style.width === '90%' ? '30vw' : '90%'; 
+                    card.style.height = card.style.height === 'auto' ? 'fit-content' : 'auto';
+                    toggleNodeSelection('{{ node.node_id }}');"
+                  >
+                    <img src="{{ url_for('static', filename='images/resize.png') }}" 
+                    alt="ResizeCard" style="width: 24px; height: 24px;">
+                  </button>
+                  <!-- <button type="button" class="btn simple-round-button">
+                    <img src="{{ url_for('static', filename='images/clear.png') }}" alt="ResetCard" style="width: 24px; height: 24px;">
+                  </button> -->
                 </div>
                 <p class="card-text">{{ node }}</p>
               

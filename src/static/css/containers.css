@@ -147,7 +147,7 @@
   border: 1px dashed grey;
   border-radius: 8px;
   display: flex;
-  height: 30vh;
+  height: fit-content;
   /* max-height: 72vh; */
   resize: both;
   overflow: scroll; 
