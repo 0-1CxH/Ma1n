@@ -2,6 +2,8 @@ import argparse
 from src.backend.user import UserManager
 # PYTHONPATH=$(pwd) python  scripts/create_new_user.py test-common-user test-common-password 
 # PYTHONPATH=$(pwd) python  scripts/create_new_user.py test-high-user test-high-password --perm_type 1 --resrc_type 1
+# PYTHONPATH=$(pwd) python  scripts/create_new_user.py test-lv2-user test-lv2-password --perm_type 2 --resrc_type 1
+# 
 
 parser = argparse.ArgumentParser(description='Create a new user.')
 parser.add_argument('username', type=str, help='Username for the new user.')

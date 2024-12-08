@@ -50,6 +50,10 @@
               <small class="text-center" style="margin-right: 4em;">{{ sess_info.conv_abst.ctime }}</small>
               <small class="text-muted">{{ sess_info.conv_abst.note | safe }}</small>
             </div>
+
+          {% if sess_info.owner != username %}
+          <span class="badge badge-secondary">Owned by {{ sess_info.owner }} </span>
+          {% endif %}
             
         </a>
         <button class="btn" onclick="deleteSession('{{ sess_info.session_id }}')">

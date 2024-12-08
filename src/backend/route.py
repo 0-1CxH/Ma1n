@@ -23,9 +23,8 @@ def register_main_routes(app, conversation_manager):
     @app.route('/list-sessions')
     @login_required
     def get_sessions():
-        username = current_user.username
-        all_session_info = conversation_manager.get_conversations_by_username(username)
-        return render_template('history.html', username=username, all_session_info=all_session_info)
+        all_session_info = conversation_manager.get_conversations_by_username(current_user)
+        return render_template('history.html', username=current_user.username, all_session_info=all_session_info)
 
     @app.route('/submit-session', methods=['POST'])
     @login_required
@@ -69,12 +68,11 @@ def register_main_routes(app, conversation_manager):
             call_step_when_load = False
         else:
             call_step_when_load = True
-        username = current_user.username
-        ret_dict = conversation_manager.get_session_info_by_id(session_id, username)
+        ret_dict = conversation_manager.get_session_info_by_id(session_id, current_user)
         if ret_dict["code"] == 0:
             return render_template(
                 'conversation.html', 
-                username=username,
+                username=current_user.username,
                 session_id=session_id,
                 conv_folder=ret_dict["conv_folder"],
                 conv_nodes_file_content=ret_dict["conv_nodes_file_content"],
@@ -87,8 +85,7 @@ def register_main_routes(app, conversation_manager):
     @app.route('/delete-session')
     def delete_session_by_id():
         session_id = request.args.get('id')
-        username = current_user.username
-        return conversation_manager.delete_conversation_info(session_id, username)
+        return conversation_manager.delete_conversation_info(session_id, current_user)
     
     @app.route('/step', methods=['POST'])
     def take_intelligence_step_by_id():

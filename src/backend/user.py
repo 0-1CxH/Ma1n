@@ -4,12 +4,33 @@ from .sqlite_utils import sqlite_connect_and_execute
 # User class
 class User(UserMixin):
     def __init__(self, username, perm_type, resrc_type):
+        # username id unique
+        # perm_type: 
+        #  -1: (experience user) 
+        #   0: view shared, delete self, step self
+        #   1: view all, delete self, step self
+        #   2: view all, delete all, step self 
+        # resrc_type:
+        #  -1: (experience user), quota of 1GB, max 5 sessions
+        #   0: quota of 10GB, no count limit
+        #   1: unlimited quota and count
         self.username = username
         self.perm_type = perm_type
         self.resrc_type = resrc_type
     
     def get_id(self):
         return self.username
+    
+    def has_view_shared_permission(self):
+        return self.perm_type >= 0
+    
+    def has_view_all_permission(self):
+        return self.perm_type >= 1
+    
+    def has_delete_all_permission(self):
+        return self.perm_type >= 2
+    
+
 
 
 class UserManager:

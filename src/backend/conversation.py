@@ -42,6 +42,7 @@ class ConversationAbstract:
 class SessionInfo:
     conv_abst: ConversationAbstract
     session_id: str
+    owner: str
 
 
 @dataclass
@@ -91,8 +92,13 @@ class ConversationManager:
         )
     '''
 
+    query_all_session_sql =  '''
+        SELECT session_id, conversation_folder, owner_username 
+        FROM session_info 
+    '''
+
     query_session_sql =  '''
-        SELECT session_id, conversation_folder 
+        SELECT session_id, conversation_folder, owner_username 
         FROM session_info 
         WHERE owner_username = ?
     '''
@@ -260,14 +266,15 @@ class ConversationManager:
         return ConversationAbstract.from_file(abst_file_path)
     
 
-    def get_session_info_by_id(self, session_id, username):
+    def get_session_info_by_id(self, session_id, current_user):
+        username = current_user.username
         owner, conv_folder = sqlite_connect_and_execute(
             self.session_db_path, 
             self.query_session_by_id_sql,
             args=(session_id,),
             fetch="one"
         )
-        if owner == username:
+        if owner == username or current_user.has_view_shared_permission():
             conv_nodes_file = os.path.join(conv_folder, self.nodes_filename)
             try:
                 with open(conv_nodes_file) as f:
@@ -285,15 +292,16 @@ class ConversationManager:
 
 
     
-    def delete_conversation_info(self, session_id, username):
+    def delete_conversation_info(self, session_id, current_user):
         # delete folder (including abst, inpt, otpt and everything) and remove from db
+        username = current_user.username
         owner, conv_folder = sqlite_connect_and_execute(
             self.session_db_path, 
             self.query_session_by_id_sql,
             args=(session_id,),
             fetch="one"
         )
-        if owner == username:
+        if owner == username or current_user.has_delete_all_permission():
             sqlite_connect_and_execute(
                 self.session_db_path,
                 self.delete_session_sql,
@@ -326,23 +334,32 @@ class ConversationManager:
                     "conv_nodes_file_content": conv_nodes_file_content,
                 }
         else:
-            return {"code": -1, "reason": "No Permission."}
+            return {"code": -1, "reason": "No permission to take step, therefore the input box is banned."}
 
     
-    def get_conversations_by_username(self, username):
-        rows = sqlite_connect_and_execute(
-            self.session_db_path, 
-            self.query_session_sql,
-            args=(username,),
-            fetch="all"
-        )
+    def get_conversations_by_username(self, current_user):
+        username = current_user.username
+
+        if current_user.has_view_all_permission():
+            rows = sqlite_connect_and_execute(
+                self.session_db_path,
+                self.query_all_session_sql,
+                fetch="all"
+            )
+        else:
+            rows = sqlite_connect_and_execute(
+                self.session_db_path, 
+                self.query_session_sql,
+                args=(username,),
+                fetch="all"
+            )
         if rows:
             all_session_info = []
             for row in rows:
-                session_id, conversation_folder = row
+                session_id, conversation_folder, owner_username = row
                 conv_abst = self.get_conversation_abstract(conversation_folder)
                 all_session_info.append(
-                    SessionInfo(conv_abst, session_id)
+                    SessionInfo(conv_abst, session_id, owner_username)
                 )
             all_session_info.sort(key=lambda session: session.conv_abst.ctime, reverse=True)
             return all_session_info
