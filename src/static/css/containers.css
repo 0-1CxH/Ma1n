@@ -179,6 +179,16 @@
 
 .main-submit-progress-container {
   background-color: white;
+  border-radius: 8px;
   margin-left: 10vw;
   margin-right: 10vw;
+}
+
+.conv-submit-progress-container {
+  margin-top: 2vh;
+  margin-bottom: 2vh;
+  border-radius: 8px;
+  margin-left: 10vw;
+  margin-right: 10vw;
+  background-color: #ccc;
 }

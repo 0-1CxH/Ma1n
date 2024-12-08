@@ -73,6 +73,11 @@ function showInputBox() {
     const allRowsContainer = document.getElementById('all-rows-container');
     allRowsContainer.style.maxHeight = "75vh";
     allRowsContainer.style.height = "auto";
+    const convSubmitProgressContainer = document.getElementById('conv-submit-progress-container');
+    convSubmitProgressContainer.style.height = "0";
+    convSubmitProgressContainer.style.marginTop = "0";
+    convSubmitProgressContainer.style.marginButtom = "0";
+
 
 }
 
@@ -80,9 +85,12 @@ function hideInputBox() {
     const mainInputEditor = document.getElementById("main-input-editor");
     mainInputEditor.innerHTML = ``;
     const allRowsContainer = document.getElementById('all-rows-container');
-    allRowsContainer.style.maxHeight = "90vh";
+    allRowsContainer.style.maxHeight = "85vh";
     allRowsContainer.style.height = "auto";
-
+    const convSubmitProgressContainer = document.getElementById('conv-submit-progress-container');
+    convSubmitProgressContainer.style.height = "16px";
+    convSubmitProgressContainer.style.marginTop = "2vh";
+    convSubmitProgressContainer.style.marginButtom = "2vh";
 }
 
 function stepSubmit(triggered_by_button) {

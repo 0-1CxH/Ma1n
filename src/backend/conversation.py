@@ -9,33 +9,8 @@ from dataclasses import dataclass
 from typing import List
 from flask_socketio import emit
 from .sqlite_utils import sqlite_connect_and_execute
-
+from .defines import ConversationAbstract, ContentNode, ContentEdge, ConversationNodes
 from ..intelligence.execute import IntelligenceManger
-
-@dataclass
-class ConversationAbstract:
-    title: str
-    ctime: str
-    abst: str
-    note: str
-
-    def to_file(self, abst_file):
-        with open(abst_file, "w") as f:
-            json.dump(self.__dict__, f, ensure_ascii=False, indent=4)
-    
-    @classmethod
-    def from_file(cls, abst_file):
-        if not os.path.exists(abst_file):
-            return cls(
-                title = "Infomation Not Found",
-                ctime = "",
-                abst = f"The abstract file at {abst_file} is missing.",
-                note = ""
-            )
-        with open(abst_file) as f:
-            return cls(**json.load(f))
-
-
 
 
 @dataclass
@@ -45,39 +20,33 @@ class SessionInfo:
     owner: str
 
 
-@dataclass
-class ContentNode:
-    node_id: str
-    level: int
-    valid: bool
-    node_type: str # M[material], A[artifact], I[instruction], R[response]
-    name: str
-    mime_type: str = None
-    note: str = None
-    related_file_path: str = None
-    cap_img_path: str = None
-    intelligence_processed: bool = False
 
-@dataclass
-class ContentEdge:
-    source_node_id: str
-    target_node_id: str
 
-@dataclass
-class ConversationNodes:
-    nodes: List[ContentNode]
-    edges: List[ContentEdge]
+class ConversationFolderStructure:
+    abst_filename = "abst.json"
+    nodes_filename = "nodes.json"
+    input_material_folder_name = "input_material"
+    output_material_folder_name = "output_material"
 
-    def get_max_level(self):
-        return max([node.level for node in self.nodes])
+    @classmethod
+    def get_conv_abst_obj(cls, conv_folder):
+        abst_file_path = os.path.join(conv_folder, cls.abst_filename)
+        return ConversationAbstract.from_file(abst_file_path)
     
-    def to_file(self, nodes_file):
-        with open(nodes_file, "w") as f:
-            json.dump({
-                "nodes": [n.__dict__ for n in self.nodes],
-                "edges": [e.__dict__ for e in self.edges],
-                "max_node_level": self.get_max_level(),
-            }, f, ensure_ascii=False, indent=4)
+    @classmethod
+    def put_conv_abst_obj(cls, conv_folder, conv_abst_obj):
+        abst_file_path = os.path.join(conv_folder, cls.abst_filename)
+        conv_abst_obj.to_file(abst_file_path)
+    
+    @classmethod
+    def get_conv_nodes_obj(cls, conv_folder, ret):
+        conv_nodes_file = os.path.join(conv_folder, cls.nodes_filename)
+        return ConversationNodes.from_file(conv_nodes_file, ret)
+    
+    @classmethod
+    def put_conv_nodes_obj(cls, conv_folder, conv_nodes_obj):
+        nodes_file_path = os.path.join(conv_folder, cls.nodes_filename)
+        conv_nodes_obj.to_file(nodes_file_path)
 
 
 
@@ -118,11 +87,6 @@ class ConversationManager:
         WHERE session_id = ? 
     '''
 
-    abst_filename = "abst.json"
-    nodes_filename = "nodes.json"
-    input_material_folder_name = "input_material"
-    output_material_folder_name = "output_material"
-
     def __init__(self, session_db_path: str, conversation_store_root: str) -> None:
         if ConversationManager.conversation_manager_instance is not None:
             return
@@ -142,7 +106,6 @@ class ConversationManager:
         os.makedirs(conversation_folder)
         
         # save abst file to folder
-        abst_file_path = os.path.join(conversation_folder, self.abst_filename)
         title = all_submitted_content["user_input"][:50]
         if len(title) == 0:
             title = "(No Title for Now, will Generate Soon)"
@@ -153,7 +116,7 @@ class ConversationManager:
             abst="(No Abstract for Now, will Generate Soon)",
             note=note,
         )
-        conv_abst.to_file(abst_file_path)
+        ConversationFolderStructure.put_conv_abst_obj(conversation_folder, conv_abst)
 
         # create nodes
         all_content_nodes = []
@@ -176,9 +139,9 @@ class ConversationManager:
         )
 
         # process the files and links
-        input_material_folder = os.path.join(conversation_folder, self.input_material_folder_name)
+        input_material_folder = os.path.join(conversation_folder, ConversationFolderStructure.input_material_folder_name)
         os.makedirs(input_material_folder)
-        os.makedirs(os.path.join(conversation_folder, self.output_material_folder_name))
+        os.makedirs(os.path.join(conversation_folder, ConversationFolderStructure.output_material_folder_name))
         for upfile in all_submitted_content["uploaded_files"]:
             num_nodes_created += 1
             socketio.emit('main_submit_progress_update', 
@@ -253,17 +216,14 @@ class ConversationManager:
 
         
         # save nodes file to folder
-        nodes_file_path = os.path.join(conversation_folder, self.nodes_filename)
-        with open(nodes_file_path, "w") as f:
-            nodes_obj = ConversationNodes(nodes=all_content_nodes, edges=[])
-            nodes_obj.to_file(nodes_file_path)
+        nodes_obj = ConversationNodes(nodes=all_content_nodes, edges=[])
+        ConversationFolderStructure.put_conv_nodes_obj(conversation_folder, nodes_obj)
         
 
     
     def get_conversation_abstract(self, conversation_folder):
         # get abst from folder
-        abst_file_path = os.path.join(conversation_folder, self.abst_filename)
-        return ConversationAbstract.from_file(abst_file_path)
+        return ConversationFolderStructure.get_conv_abst_obj(conversation_folder)
     
 
     def get_session_info_by_id(self, session_id, current_user):
@@ -275,15 +235,14 @@ class ConversationManager:
             fetch="one"
         )
         if owner == username or current_user.has_view_shared_permission():
-            conv_nodes_file = os.path.join(conv_folder, self.nodes_filename)
+            conv_nodes_file = os.path.join(conv_folder, ConversationFolderStructure.nodes_filename)
             try:
-                with open(conv_nodes_file) as f:
-                    conv_nodes_file_content = json.loads(f.read())
-                    return {
-                        "code": 0, 
-                        "conv_folder": conv_folder, 
-                        "conv_nodes_file_content": conv_nodes_file_content
-                    }
+                conv_nodes_file_content = ConversationFolderStructure.get_conv_nodes_obj(conv_folder, ret="dict")
+                return {
+                    "code": 0, 
+                    "conv_folder": conv_folder, 
+                    "conv_nodes_file_content": conv_nodes_file_content
+                }
             except Exception as e:
                 return {"code": -2, "reason": e.__str__()}
 
@@ -315,7 +274,7 @@ class ConversationManager:
         else:
             return {"code": -1, "reason": "No Permission."}
     
-    def take_intelligence_step(self, session_id, username, selected_node_ids, user_input):
+    def take_intelligence_step(self, session_id, username, selected_node_ids, user_input, socketio):
         owner, conv_folder = sqlite_connect_and_execute(
             self.session_db_path, 
             self.query_session_by_id_sql,
@@ -323,16 +282,20 @@ class ConversationManager:
             fetch="one"
         )
         if owner == username:
-            im = IntelligenceManger(conv_folder)
-            im.step(selected_node_ids, user_input)
-            conv_nodes_file = os.path.join(conv_folder, self.nodes_filename)
-            with open(conv_nodes_file) as f:
-                conv_nodes_file_content = json.loads(f.read())
-                return {
-                    "code": 0, 
-                    "conv_folder": conv_folder, 
-                    "conv_nodes_file_content": conv_nodes_file_content,
-                }
+            conv_abst_obj = ConversationFolderStructure.get_conv_abst_obj(conv_folder)
+            conv_nodes_obj = ConversationFolderStructure.get_conv_nodes_obj(conv_folder, ret="obj")
+            intelligence_manager = IntelligenceManger(conv_abst_obj, conv_nodes_obj, socketio)
+            intelligence_manager.step(selected_node_ids, user_input)
+            conv_abst_obj, conv_nodes_obj = intelligence_manager.export()
+            # save objs
+            ConversationFolderStructure.put_conv_abst_obj(conv_folder, conv_abst_obj)
+            ConversationFolderStructure.put_conv_nodes_obj(conv_folder, conv_nodes_obj)
+            # ret for rendering new page
+            return {
+                "code": 0, 
+                "conv_folder": conv_folder, 
+                "conv_nodes_file_content": ConversationFolderStructure.get_conv_nodes_obj(conv_folder, ret="dict"),
+            }
         else:
             return {"code": -1, "reason": "No permission to take step, therefore the input box is banned."}
 

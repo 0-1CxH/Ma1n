@@ -99,7 +99,8 @@ def register_main_routes(app, conversation_manager):
             session_id, 
             username,
             selected_node_ids,
-            user_input
+            user_input,
+            socketio=socketio
         )
         # if ret_dict["code"] == 0:
         #     return render_template(
