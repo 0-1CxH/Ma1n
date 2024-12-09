@@ -55,6 +55,7 @@ class ContentNode:
     # for type R node:
     # name is full response
     # note is x/y responses in batch
+    # source is also required (for regenerate)
     
     # for type A node:
     # name is filename

@@ -18,7 +18,7 @@ function toggleNodeSelection(nodeId) {
   }
 
 function toggleNodeSelectionForLevel(level) {
-    const nodesAtLevel = document.querySelectorAll(`#node-cards-row-container-level-${level} .node-item-card`);
+    const nodesAtLevel = document.querySelectorAll(`#node-cards-row-container-level-${level} .node-item-card, #node-cards-row-container-level-${level} .node-item-card-full-width`);
     let changedCount = 0;
     nodesAtLevel.forEach(nodeElement => {
         const nodeId = nodeElement.id.replace('node-item-card-', '');

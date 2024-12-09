@@ -22,21 +22,27 @@ class IntelligenceManger:
             time.sleep(1)
         if self.conv_nodes_obj.get_max_level() < 10:
             self.conv_abst_obj.title = f"Mock of {self.conv_nodes_obj.get_max_level()}"
-            mock_response = ContentNode(
-                node_id = str(uuid.uuid4()),
-                level = self.conv_nodes_obj.get_max_level() + 1,
-                valid=True,
-                node_type="R",
-                name="here is a mock of response.",
-                intelligence_processed=True
-            )
-            self.conv_nodes_obj.nodes.append(mock_response)
+            lv =self.conv_nodes_obj.get_max_level() + 1
+            for _ in range(self.conv_nodes_obj.get_max_level()+1):
+                mock_response = ContentNode(
+                    node_id = str(uuid.uuid4()),
+                    level = lv,
+                    valid=True,
+                    node_type="R",
+                    name="here is a mock of response.",
+                    intelligence_processed=True,
+                    note=f"{_+1}/{self.conv_nodes_obj.get_max_level()+1}"
+                )
+                self.conv_nodes_obj.nodes.append(mock_response)
             mock_artiface = ContentNode(
                 node_id = str(uuid.uuid4()),
-                level = self.conv_nodes_obj.get_max_level(),
+                level = lv ,
                 valid=True,
                 node_type="A",
-                name="here is a mock of artifact.",
+                mime_type="text/code",
+                name=f"artifact{lv}.file",
+                note="This is the mock of generation messages",
+                related_file_path="x/xxx/xx",
                 intelligence_processed=True
             )
             self.conv_nodes_obj.nodes.append(mock_artiface)

@@ -48,41 +48,25 @@
       class="node-cards-row-container d-flex my-2" 
       onclick="if (event.target === this && !event.target.closest('.btn-group')) { toggleNodeSelectionForLevel('{{ level }}'); }">
         {% for node in conv_nodes_file_content.nodes if node.level == level %}
+            {% if node.node_type in ["I", "R"] and node.name|length > 400 %} 
+            <div id="node-item-card-{{ node.node_id }}" 
+            class="card node-item-card-full-width flex-grow-1 m-2"
+            onclick="toggleNodeSelection('{{ node.node_id }}');"
+            onmouseover="this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });"
+            >
+            {% else %}
             <div id="node-item-card-{{ node.node_id }}" 
             class="card node-item-card flex-grow-1 m-2"
             onclick="toggleNodeSelection('{{ node.node_id }}');"
-            onmouseover="this.scrollIntoView({ behavior: 'smooth', inline: 'center' });"
+            onmouseover="this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });"
             >
+            {% endif %}
 
               <div class="card-body primary-font">
 
-                {% if node.node_type == "I" %}
-                <span class="badge badge-secondary">Instruction::{{ node.note }}</span>
-                {% elif node.node_type == "R" %}
-                <span class="badge badge-secondary">Response</span>
-                {% elif node.node_type == "M" %}
-                <span class="badge badge-secondary">Material</span>
-                {% elif node.node_type == "A" %}
-                <span class="badge badge-secondary">Artifact</span>
-                <!-- <h5 class="card-title">{{ node.name }}</h5> -->
-                {% endif %}
-
-                {% if not node.valid %}
-                <span class="badge badge-warning">Invalid</span>
-                {% endif %}
-
-                {% if node.node_type == "I" %}
-                <h5 class="card-text mb-2">{{ node.name }}</h5>
-                {% elif node.node_type == "R" %}
-                <h5 class="card-text mb-1">{{ node.name }}</h5>
-                {% endif %}
-
-
-                
-
-                <div class="btn-group" role="group" aria-label="Node Actions">
+                <span class="btn-group mt-auto" role="group" aria-label="Node Actions" style="margin-right: 15px;">
                   <button type="button" class="btn smaller-round-button"
-                    onclick="navigator.clipboard.writeText(this.closest('.card-body').querySelector('.card-text').innerText); 
+                    onclick="navigator.clipboard.writeText(this.closest('.card-body').querySelector('.copy-act-field').innerText); 
                       addNotification('Value copied to clipboard.', 'success');
                       toggleNodeSelection('{{ node.node_id }}');
                       ">
@@ -90,12 +74,20 @@
                       style="width: 16px; height: 16px;">
                   </button>
                   <button type="button" class="btn smaller-round-button"
-                    onclick="const card = this.closest('.node-item-card'); 
-                    card.style.width = card.style.width === '90%' ? '30vw' : '90%'; 
-                    card.style.height = card.style.height === 'auto' ? 'fit-content' : 'auto';
+                    onclick="let card = this.closest('.node-item-card');
+                    if (card==null) {
+                      card = this.closest('.node-item-card-full-width');
+                      card.style.width = card.style.width === '90%' ? '50vw' : '90%'; 
+                      card.style.height = card.style.height === 'fit-content' ? '30vh' : 'fit-content';
+                    }
+                    else {
+                      card.style.width = card.style.width === '90%' ? '30vw' : '90%'; 
+                      card.style.height = card.style.height === 'auto' ? '30vh' : 'auto';
+                    }
+                    
                     toggleNodeSelection('{{ node.node_id }}');"
                   >
-                    <img src="{{ url_for('static', filename='images/resize.png') }}" 
+                    <img src="{{ url_for('static', filename='images/expand.png') }}" 
                     alt="ResizeCard" style="width: 16px; height: 16px;">
                   </button>
                   {% if node.related_file_path and node.valid %}
@@ -111,27 +103,57 @@
 
                   {% if node.node_type in ["R", "A"] and node.valid %}
                   <button type="button" class="btn smaller-round-button"
-                  onclick="addNotification('Requesting to download the file...', 'info');
+                  onclick="addNotification('Requesting to reset the node...', 'info');
                     toggleNodeSelection('{{ node.node_id }}');
                     ">
-                    <img src="{{ url_for('static', filename='images/clear.png') }}" alt="ResetCard" style="width: 16px; height: 16px;">
+                    <img src="{{ url_for('static', filename='images/refresh.png') }}" alt="ResetCard" style="width: 16px; height: 16px;">
                   </button>
                   {% endif %}
 
-                </div>
-                {% if node.node_type in ["I","R"] %}
-                <!-- <p class="card-text">{{ node.name }}</p> -->
+                </span>
+                
+
+                {% if node.node_type == "I" %}
+                <span class="card-text valid-card-title mt-1 mb-1" style="max-height: 15%; overflow-y: scroll;">::{{ node.note }}</span>                
+                <h5 class="card-text mass-text-font copy-act-field mt-2 mb-2" style="height: 72%; overflow-y: scroll;">{{ node.name }}</h5>
+                <span class="badge badge-dark">Instruction</span>
+                
+                {% elif node.node_type == "R" %}
+                <h5 class="card-text mass-text-font copy-act-field mt-2 mb-2" style="height: 72%; overflow-y: scroll;">{{ node.name }}</h5> 
+                {% if not node.valid %}
+                <span class="badge badge-danger">Response(Invalid)</span>
                 {% else %}
-                <p class="card-text">{{ node.note }}</p>
-                <p class="mb-1" style="max-height: 15vh; overflow-y: scroll;">{{ node }}</p>
+                <span class="badge badge-dark">Response({{ node.note }})</span>
+                {% endif %}
+                
+                {% elif node.node_type == "M" %}
+                {% if not node.valid %}
+                <span class="card-text valid-card-title mt-1 mb-1" style="max-height: 15%; overflow-y: scroll;">::null::</span>
+                <h5 class="card-text invalid-card-title mt-1 mb-1" style="height: 10%; overflow-y: scroll;">{{ node.name }}</h5>
+                <h5 class="card-text mass-text-font copy-act-field mt-1 mb-2" style="height: 62%; overflow-y: scroll;">{{ node.note }}</h5>
+                <span class="badge badge-danger">Material(Invalid)</span>
+                {% else %}
+                <span class="card-text valid-card-title mt-1 mb-1" style="max-height: 15%; overflow-y: scroll;">{{ node.name }}</span>
+                <h5 class="card-text invalid-card-title mt-1 mb-1" style="height: 10%; overflow-y: scroll;">{{ node.mime_type.split(";")[0] }} :: {{ node.source.tool }}</h5>
+                <h5 class="card-text mass-text-font copy-act-field mt-1 mb-2" style="height: 62%; overflow-y: scroll;">{{ node.note }}</h5>
+                <span class="badge badge-dark text-wrap">Material</span>
+                {% endif %}
+                
+                {% elif node.node_type == "A" %}
+                <span class="card-text valid-card-title mt-1 mb-1" style="max-height: 15%; overflow-y: scroll;">{{ node.name }}</span>
+                <h5 class="card-text invalid-card-title mt-1 mb-1" style="height: 25%; overflow-y: scroll;">{{ node.mime_type }} :: {{ node.source }}</h5>
+                <h5 class="card-text mass-text-font copy-act-field mt-1 mb-2" style="height: 45%; overflow-y: scroll;">{{ node.note }}</h5>
+                {% if not node.valid %}
+                <span class="badge badge-danger">Artifact(Invalid)</span>
+                {% else %}
+                <span class="badge badge-dark">Artifact</span>
                 {% endif %}
 
-               
-                
+                {% endif %}
+                <small class="text-muted">{{ node.node_id }}</small>
     
                 <div class="d-flex">
-                  <!-- <small class="text-center" style="margin-right: 4em;">{{ node.node_id }}</small> -->
-                  <small class="text-muted">{{ node.node_id }}</small>
+                  
                 </div>
     
                 

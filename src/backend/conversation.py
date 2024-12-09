@@ -159,7 +159,7 @@ class ConversationManager:
                     name = upfile.filename,
                     source={"tool": "FrontendUploader", "args": None},
                     mime_type = upfile.mimetype,
-                    note = "from uploaded file",
+                    note = f"source:FrontendUploader({upfile.__str__()})",
                     related_file_path = save_upfile_path,
                 ))
             except Exception as e:
@@ -199,7 +199,7 @@ class ConversationManager:
                     name = os.path.basename(file_save_name), 
                     source={"tool": "WgetDownloader", "args": (elink, )},
                     mime_type = response.headers.get('Content-Type'),
-                    note = f"download with link",
+                    note = f"source:WgetDownloader({elink})",
                     related_file_path = file_save_name,
                 ))
             except Exception as e:

@@ -147,8 +147,21 @@
   border: 1px dashed grey;
   border-radius: 8px;
   display: flex;
-  height: fit-content;
+  height: 30vh;
   /* max-height: 72vh; */
+  resize: both;
+  overflow: scroll; 
+  flex-shrink: 0;
+  flex-grow: 0; 
+}
+
+.node-item-card-full-width {
+  width: 50vw;
+  min-width: 250px;
+  border: 1px dashed grey;
+  border-radius: 8px;
+  display: flex;
+  height: 30vh;
   resize: both;
   overflow: scroll; 
   flex-shrink: 0;
