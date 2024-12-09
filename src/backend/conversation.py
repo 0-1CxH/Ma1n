@@ -157,6 +157,7 @@ class ConversationManager:
                     valid = True,
                     node_type = "M",
                     name = upfile.filename,
+                    source={"tool": "FrontendUploader", "args": None},
                     mime_type = upfile.mimetype,
                     note = "from uploaded file",
                     related_file_path = save_upfile_path,
@@ -168,6 +169,7 @@ class ConversationManager:
                     valid = False,
                     node_type = "M",
                     name = upfile.filename,
+                    source={"tool": "FrontendUploader", "args": None},
                     note = f"File save error: {upfile.__str__()} ; The reason is {e.__str__()}"
                 ))
                 socketio.emit('main_submit_progress_update', 
@@ -194,9 +196,10 @@ class ConversationManager:
                     level = 0,
                     valid = True,
                     node_type = "M",
-                    name = elink, 
+                    name = os.path.basename(file_save_name), 
+                    source={"tool": "WgetDownloader", "args": (elink, )},
                     mime_type = response.headers.get('Content-Type'),
-                    note = f"download with link {elink} save as {os.path.basename(file_save_name)}",
+                    note = f"download with link",
                     related_file_path = file_save_name,
                 ))
             except Exception as e:
@@ -206,6 +209,7 @@ class ConversationManager:
                     valid = False,
                     node_type = "M",
                     name = elink,
+                    source={"tool": "WgetDownloader", "args": (elink, )},
                     note = f"Link parse error: {elink} ; The reason is {e.__str__()}"
                 ))
                 socketio.emit('main_submit_progress_update', 

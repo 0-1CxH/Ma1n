@@ -114,6 +114,11 @@ def register_main_routes(app, conversation_manager):
         #     )
         # else:
         #     return ret_dict
+    
+    @app.route('/download')
+    def download_file_by_path():
+        print(request.args.get("path"))
+        pass
 
 
 

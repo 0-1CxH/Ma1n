@@ -34,11 +34,35 @@ class ContentNode:
     valid: bool
     node_type: str # M[material], A[artifact], I[instruction], R[response]
     name: str
+    source: dict = None # {"tool": "", "args": (,), "refs": []}
     mime_type: str = None
     note: str = None
     related_file_path: str = None
     cap_img_path: str = None
     intelligence_processed: bool = False
+
+    # for type I node:
+    # name is full instruction
+    # note is selected proc func (or empty str)
+
+    # for type M node:
+    # name is filename (if downloaded) or something short (if not)
+    # note is intelligence summary (if invalid, is the error msg)
+    # source should not be None, but defines the tool and args for regen
+    # mime_type should not be None
+    # attach the related_file_path if downloaded
+
+    # for type R node:
+    # name is full response
+    # note is x/y responses in batch
+    
+    # for type A node:
+    # name is filename
+    # source should not be None, but defines the tool, args, ref nodes for regen
+    # mime_type is the type of file
+    # note is the generation message (description of arifact), (if invalid and not intel proced, is the error msg)
+    # attach the related_file_path
+
 
 
 @dataclass
