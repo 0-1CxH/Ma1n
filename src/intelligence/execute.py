@@ -31,7 +31,8 @@ class IntelligenceManger:
                     node_type="R",
                     name="here is a mock of response.",
                     intelligence_processed=True,
-                    note=f"{_+1}/{self.conv_nodes_obj.get_max_level()+1}"
+                    note=f"{_+1}/{self.conv_nodes_obj.get_max_level()+1}",
+                    source={"tool": "FixedRespOrLLMResp", "args": ("input prompt", ) }
                 )
                 self.conv_nodes_obj.nodes.append(mock_response)
             mock_artiface = ContentNode(

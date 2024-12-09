@@ -115,11 +115,12 @@
                 
 
                 {% if node.node_type == "I" %}
-                <span class="card-text valid-card-title mt-1 mb-1" style="max-height: 15%; overflow-y: scroll;">::{{ node.note }}</span>                
+                <span class="card-text valid-card-title mt-1 mb-1" style="overflow-y: scroll;">Ma1n1nput::{{ node.note }}</span>                
                 <h5 class="card-text mass-text-font copy-act-field mt-2 mb-2" style="height: 72%; overflow-y: scroll;">{{ node.name }}</h5>
                 <span class="badge badge-dark">Instruction</span>
                 
                 {% elif node.node_type == "R" %}
+                <span class="card-text valid-card-title mt-1 mb-1" style="overflow-y: scroll;">{{ node.source.tool }}</span>                
                 <h5 class="card-text mass-text-font copy-act-field mt-2 mb-2" style="height: 72%; overflow-y: scroll;">{{ node.name }}</h5> 
                 {% if not node.valid %}
                 <span class="badge badge-danger">Response(Invalid)</span>
@@ -129,21 +130,21 @@
                 
                 {% elif node.node_type == "M" %}
                 {% if not node.valid %}
-                <span class="card-text valid-card-title mt-1 mb-1" style="max-height: 15%; overflow-y: scroll;">::null::</span>
+                <!-- <span class="card-text valid-card-title mt-1 mb-1" style="overflow-y: scroll;">::null::</span> -->
                 <h5 class="card-text invalid-card-title mt-1 mb-1" style="height: 10%; overflow-y: scroll;">{{ node.name }}</h5>
                 <h5 class="card-text mass-text-font copy-act-field mt-1 mb-2" style="height: 62%; overflow-y: scroll;">{{ node.note }}</h5>
                 <span class="badge badge-danger">Material(Invalid)</span>
                 {% else %}
-                <span class="card-text valid-card-title mt-1 mb-1" style="max-height: 15%; overflow-y: scroll;">{{ node.name }}</span>
-                <h5 class="card-text invalid-card-title mt-1 mb-1" style="height: 10%; overflow-y: scroll;">{{ node.mime_type.split(";")[0] }} :: {{ node.source.tool }}</h5>
-                <h5 class="card-text mass-text-font copy-act-field mt-1 mb-2" style="height: 62%; overflow-y: scroll;">{{ node.note }}</h5>
+                <span class="card-text valid-card-title mt-1 mb-1" style="overflow-y: scroll;">{{ node.name }}</span>
+                <h5 class="card-text invalid-card-title mt-1 mb-1" style="height: 12%; overflow-y: scroll;">{{ node.mime_type.split(";")[0] }} :: {{ node.source.tool }}</h5>
+                <h5 class="card-text mass-text-font copy-act-field mt-1 mb-2" style="height: 60%; overflow-y: scroll;">{{ node.note }}</h5>
                 <span class="badge badge-dark text-wrap">Material</span>
                 {% endif %}
                 
                 {% elif node.node_type == "A" %}
-                <span class="card-text valid-card-title mt-1 mb-1" style="max-height: 15%; overflow-y: scroll;">{{ node.name }}</span>
-                <h5 class="card-text invalid-card-title mt-1 mb-1" style="height: 25%; overflow-y: scroll;">{{ node.mime_type }} :: {{ node.source }}</h5>
-                <h5 class="card-text mass-text-font copy-act-field mt-1 mb-2" style="height: 45%; overflow-y: scroll;">{{ node.note }}</h5>
+                <span class="card-text valid-card-title mt-1 mb-1" style="overflow-y: scroll;">{{ node.name }}</span>
+                <h5 class="card-text invalid-card-title mt-1 mb-1" style="height: 12%; overflow-y: scroll;">{{ node.mime_type }} :: {{ node.source }}</h5>
+                <h5 class="card-text mass-text-font copy-act-field mt-1 mb-2" style="height: 60%; overflow-y: scroll;">{{ node.note }}</h5>
                 {% if not node.valid %}
                 <span class="badge badge-danger">Artifact(Invalid)</span>
                 {% else %}

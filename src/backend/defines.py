@@ -43,7 +43,7 @@ class ContentNode:
 
     # for type I node:
     # name is full instruction
-    # note is selected proc func (or empty str)
+    # note is selected proc func
 
     # for type M node:
     # name is filename (if downloaded) or something short (if not)
