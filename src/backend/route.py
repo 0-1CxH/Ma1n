@@ -1,6 +1,6 @@
 import uuid
 import os
-from flask import render_template, request, url_for, request
+from flask import render_template, request, url_for, request, send_file
 from flask_login import login_required, current_user
 from flask_socketio import SocketIO
 from ..intelligence.constants import supported_process_functions
@@ -95,30 +95,31 @@ def register_main_routes(app, conversation_manager):
         if selected_node_ids:
             selected_node_ids = selected_node_ids.split(";")
         user_input = request.form.get('userInput', None)
+        reset_node = request.form.get('resetNode', None)
         username = current_user.username
         return conversation_manager.take_intelligence_step(
             session_id, 
             username,
             selected_node_ids,
             user_input,
+            reset_node,
             socketio=socketio
         )
-        # if ret_dict["code"] == 0:
-        #     return render_template(
-        #         'conversation.html', 
-        #         username=username,
-        #         session_id=session_id,
-        #         conv_folder=ret_dict["conv_folder"],
-        #         conv_nodes_file_content=ret_dict["conv_nodes_file_content"],
-        #         call_step_when_load=False,
-        #     )
-        # else:
-        #     return ret_dict
     
     @app.route('/download')
     def download_file_by_path():
-        print(request.args.get("path"))
-        pass
+        file_path = request.args.get("path")
+        if not (os.path.basename(os.path.dirname(file_path)) in ["input_material", "output_material" ] or "abst.json" in file_path or "nodes.json" in file_path):
+            return {"code": -3, "reason": "Congrats! you found this vulnerability, but it is fixed."}
+        print("After check")
+        user_store_root = os.path.join(conversation_manager.conversation_store_root, current_user.username) 
+        if file_path.startswith(user_store_root) or current_user.has_view_all_permission():
+            try:
+                return send_file(file_path, as_attachment=True)
+            except Exception as e:
+                return {"code":-2, "reason": e.__str__()}
+        else:
+            return {"code": -1, "reason": "No permission."}
 
 
 

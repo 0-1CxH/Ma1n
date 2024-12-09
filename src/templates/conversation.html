@@ -105,6 +105,7 @@
                   <button type="button" class="btn smaller-round-button"
                   onclick="addNotification('Requesting to reset the node...', 'info');
                     toggleNodeSelection('{{ node.node_id }}');
+                    stepSubmit(false, '{{ node.node_id }}');
                     ">
                     <img src="{{ url_for('static', filename='images/refresh.png') }}" alt="ResetCard" style="width: 16px; height: 16px;">
                   </button>
@@ -191,7 +192,7 @@
 {% if call_step_when_load %}
 <script>
   document.addEventListener('DOMContentLoaded', (event) => {
-    stepSubmit(false);
+    stepSubmit(false, false);
   });
 </script>
 {% endif %}

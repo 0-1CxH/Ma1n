@@ -3,6 +3,7 @@ import json
 import shutil
 import uuid
 import wget
+import time
 import datetime
 import requests
 from dataclasses import dataclass
@@ -27,6 +28,8 @@ class ConversationFolderStructure:
     nodes_filename = "nodes.json"
     input_material_folder_name = "input_material"
     output_material_folder_name = "output_material"
+    write_lock_filename = ".write.lock"
+    expire_minutes = 5
 
     @classmethod
     def get_conv_abst_obj(cls, conv_folder):
@@ -47,6 +50,27 @@ class ConversationFolderStructure:
     def put_conv_nodes_obj(cls, conv_folder, conv_nodes_obj):
         nodes_file_path = os.path.join(conv_folder, cls.nodes_filename)
         conv_nodes_obj.to_file(nodes_file_path)
+    
+    @classmethod
+    def add_lock(cls, conv_folder):
+        lock_file_path = os.path.join(conv_folder, cls.write_lock_filename)
+        with open(lock_file_path, 'w') as lock_file:
+            lock_file.write(str(datetime.datetime.now() + datetime.timedelta(minutes=cls.expire_minutes)))
+
+    @classmethod
+    def is_lock_expired(cls, conv_folder):
+        lock_file_path = os.path.join(conv_folder, cls.write_lock_filename)
+        if not os.path.exists(lock_file_path):
+            return True
+        with open(lock_file_path, 'r') as lock_file:
+            lock_expiry_time = datetime.datetime.fromisoformat(lock_file.read().strip())
+            return datetime.datetime.now() > lock_expiry_time
+
+    @classmethod
+    def remove_lock(cls, conv_folder):
+        lock_file_path = os.path.join(conv_folder, cls.write_lock_filename)
+        if os.path.exists(lock_file_path):
+            os.remove(lock_file_path)
 
 
 
@@ -279,7 +303,7 @@ class ConversationManager:
         else:
             return {"code": -1, "reason": "No Permission."}
     
-    def take_intelligence_step(self, session_id, username, selected_node_ids, user_input, socketio):
+    def take_intelligence_step(self, session_id, username, selected_node_ids, user_input, reset_node, socketio):
         owner, conv_folder = sqlite_connect_and_execute(
             self.session_db_path, 
             self.query_session_by_id_sql,
@@ -287,14 +311,24 @@ class ConversationManager:
             fetch="one"
         )
         if owner == username:
+            spin_time = 10
+            while not ConversationFolderStructure.is_lock_expired(conv_folder):
+                print(f"{conv_folder} is locked")
+                time.sleep(spin_time)
+                spin_time *= 2
+            ConversationFolderStructure.add_lock(conv_folder)
+            
             conv_abst_obj = ConversationFolderStructure.get_conv_abst_obj(conv_folder)
             conv_nodes_obj = ConversationFolderStructure.get_conv_nodes_obj(conv_folder, ret="obj")
             intelligence_manager = IntelligenceManger(conv_abst_obj, conv_nodes_obj, socketio)
-            intelligence_manager.step(selected_node_ids, user_input)
+            intelligence_manager.step(selected_node_ids, user_input, reset_node)
             conv_abst_obj, conv_nodes_obj = intelligence_manager.export()
             # save objs
             ConversationFolderStructure.put_conv_abst_obj(conv_folder, conv_abst_obj)
             ConversationFolderStructure.put_conv_nodes_obj(conv_folder, conv_nodes_obj)
+            # release lock
+            ConversationFolderStructure.remove_lock(conv_folder)
+            
             # ret for rendering new page
             return {
                 "code": 0, 
@@ -334,5 +368,4 @@ class ConversationManager:
 
         else:
             return []
-        
-        
+    

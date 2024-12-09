@@ -14,9 +14,9 @@ class IntelligenceManger:
             content
         )
 
-    def step(self, selected_node_ids, user_input):
+    def step(self, selected_node_ids, user_input, reset_node):
         import time
-        print(selected_node_ids, user_input)
+        print(selected_node_ids, user_input, reset_node)
         for i in range(5):
             self.send_by_socketio({"obj": "pbar", "current": i, "total": 5})
             time.sleep(1)

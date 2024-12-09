@@ -67,9 +67,9 @@ function showInputBox() {
 
             <textarea class="buttom-editor full-width-text-editor" 
                 id="buttom-editor" placeholder="You can select/unselect node(s) by clicking each node card, or all nodes in a row by clicking the row blank. "
-                onkeydown="if (event.shiftKey && event.key === 'Enter') { event.preventDefault(); stepSubmit(true);}"></textarea>
+                onkeydown="if (event.shiftKey && event.key === 'Enter') { event.preventDefault(); stepSubmit(true, false);}"></textarea>
             <button class="btn bigger-round-button" 
-                onclick="stepSubmit(true)"
+                onclick="stepSubmit(true, false)"
                 onmouseover="this.style.backgroundColor='#efefef'; this.style.border='2px dashed black';" 
                 onmouseout="this.style.backgroundColor='white'; this.style.border='2px solid grey';">
                 <img src="/static/images/up.png" alt="TakeStep" width="20px" height="20px">
@@ -97,7 +97,7 @@ function hideInputBox() {
     convSubmitProgressContainer.style.marginButtom = "2vh";
 }
 
-function stepSubmit(triggered_by_button) {
+function stepSubmit(triggered_by_button, triggered_by_reset) {
 
     const formData = new FormData();
     formData.append('sessionId', currentSessionId)
@@ -105,6 +105,9 @@ function stepSubmit(triggered_by_button) {
         const userInput = document.getElementById('buttom-editor').value;
         formData.append('userInput', userInput);
         formData.append('selectedNodes', selectedNodes.join(";"))
+    }
+    if (triggered_by_reset) {
+        formData.append('resetNode', triggered_by_reset)
     }
     
     console.log(formData)
