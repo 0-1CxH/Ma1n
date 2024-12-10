@@ -101,7 +101,7 @@
                   </button>
                   {% endif %}
 
-                  {% if node.node_type in ["R", "M"] %}
+                  {% if node.node_type == "R" or (node.node_type == "M" and not node.valid) %}
                   <button type="button" class="btn smaller-round-button"
                   onclick="addNotification('Requesting to reset the node...', 'info');
                     toggleNodeSelection('{{ node.node_id }}');

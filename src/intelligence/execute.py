@@ -1,4 +1,5 @@
 import uuid
+from multiprocessing import Pool
 from ..backend.defines import ConversationAbstract, ConversationNodes, ContentNode, ContentEdge
 from .tools import ToolCaller
 
@@ -7,6 +8,7 @@ class IntelligenceManger:
         self.conv_abst_obj = conv_abst_obj
         self.conv_nodes_obj = conv_nodes_obj
         self.socketio = socketio
+        self.mproc_pool = Pool(20)
         print(self.conv_abst_obj, self.conv_nodes_obj)
     
     def send_by_socketio(self, content):
@@ -19,26 +21,52 @@ class IntelligenceManger:
         self.send_by_socketio({"obj": "pbar", "current": current, "total": total})
 
     def step(self, selected_node_ids, user_input, reset_node):
-        import time
         print(selected_node_ids, user_input, reset_node)
 
         # pre process
         # check if file exists, if not set to invalid
+        if selected_node_ids is not None:
+            selected_node_ids.split(";")
         
-        if reset_node is not None: # reset mode
-            # set the node to invalid
-            # node.source["tool"]
-            pass
-        else: # submit mode
-            if user_input is None: # view mode
-                # no need to create I node.
-                pass
-            else: # addition mode
-                if selected_node_ids is None:
-                    # all max level nodes are seleceted
-                    pass
-                # create new I node at max level of selected nodes
-                pass
+        max_level = -1
+        current_level_node_ids = None
+
+        for idx, node in enumerate(self.conv_nodes_obj.nodes):
+            if reset_node is not None: # reset mode
+                if node.node_id == reset_node:
+                    self.conv_nodes_obj.nodes[idx].valid = False
+                    break
+            else: # view/append mode
+                if selected_node_ids is not None:
+                    if node.node_id in selected_node_ids:
+                        max_level = max(max_level, node.level)
+                else: # append mode
+                    if max_level < node.level:
+                        current_level_node_ids = [node.node_id]
+                        max_level = max(max_level, node.level)
+                    elif max_level == node.level:
+                        current_level_node_ids.append(node.node_id)
+                    else:
+                        pass
+        if current_level_node_ids is not None:
+            selected_node_ids = current_level_node_ids
+        
+        print(max_level, selected_node_ids)
+        
+        # if reset_node is not None:
+        #     # set the node to invalid
+        #     # node.source["tool"]
+        #     pass
+        # else:
+        #     if user_input is None: # view mode
+        #         # no need to create I node.
+        #         pass
+        #     else: # addition mode
+        #         if selected_node_ids is None:
+        #             # all max level nodes are seleceted
+        #             pass
+        #         # create new I node at max level of selected nodes
+        #         pass
         
         # real process
         # invalid node regenerate 
@@ -48,6 +76,8 @@ class IntelligenceManger:
                     self.conv_nodes_obj.nodes[idx] = ToolCaller.get_tool(node.source["tool"]).replay(
                         node, other_kwargs={}
                     )
+        # not intellect processed material, use tool to summary
+         
         # new response node if inst not resped
         for node in self.conv_nodes_obj.nodes:
             if node.node_type == "I":
