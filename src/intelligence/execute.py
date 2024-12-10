@@ -23,6 +23,8 @@ class IntelligenceManger:
         print(selected_node_ids, user_input, reset_node)
 
         # pre process
+        # check if file exists, if not set to invalid
+        
         if reset_node is not None: # reset mode
             # set the node to invalid
             # node.source["tool"]
