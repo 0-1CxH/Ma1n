@@ -130,8 +130,11 @@
                 
                 {% elif node.node_type == "M" %}
                 <span class="card-text valid-card-title mt-1 mb-1" style="overflow-y: scroll;">{{ node.name }}</span>
-                <h5 class="card-text invalid-card-title mt-1 mb-1" style="height: 10%; overflow-y: scroll;">{{ node.mime_type.split(";")[0] if node.mime_type else "null" }} :: {{ node.source }}</h5>
-                <h5 class="card-text mass-text-font copy-act-field mt-1 mb-2" style="height: 65%; overflow-y: scroll;">{{ node.note }}</h5>
+                
+                <h5 class="card-text mass-text-font copy-act-field mt-1 mb-2" style="height: 75%; overflow-y: scroll;">
+                  <div class="inline-card-title mt-1 mb-1">{{ node.mime_type.split(";")[0] if node.mime_type else "null" }} :: {{ node.source }}</div>
+                  {{ node.note }}
+                </h5>
                 {% if not node.valid %}
                 <span class="badge badge-danger">Material(Invalid)</span>
                 {% else %}

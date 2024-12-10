@@ -67,9 +67,28 @@ function showInputBox() {
 
             <textarea class="buttom-editor full-width-text-editor" 
                 id="buttom-editor" placeholder="You can select/unselect node(s) by clicking each node card, or all nodes in a row by clicking the row blank. "
-                onkeydown="if (event.shiftKey && event.key === 'Enter') { event.preventDefault(); stepSubmit(true, false);}"></textarea>
+                onkeydown="if (event.shiftKey && event.key === 'Enter') { 
+                    event.preventDefault(); 
+                    const inputValue = document.getElementById('buttom-editor').value;
+                    if ( inputValue != null) {
+                        if (inputValue.trim() != '') {
+                            stepSubmit(true, false);
+                            return
+                        }
+                    }
+                    addNotification('Need non-empty instructions, not submitting.', 'error')
+                }"></textarea>
             <button class="btn bigger-round-button" 
-                onclick="stepSubmit(true, false)"
+                onclick="
+                const inputValue = document.getElementById('buttom-editor').value;
+                    if ( inputValue != null) {
+                        if (inputValue.trim() != '') {
+                            stepSubmit(true, false);
+                            return
+                        }
+                    }
+                    addNotification('Need non-empty instructions, not submitting.', 'error');
+                "
                 onmouseover="this.style.backgroundColor='#efefef'; this.style.border='2px dashed black';" 
                 onmouseout="this.style.backgroundColor='white'; this.style.border='2px solid grey';">
                 <img src="/static/images/up.png" alt="TakeStep" width="20px" height="20px">

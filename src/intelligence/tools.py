@@ -33,10 +33,6 @@ class BaseTool:
         node.node_id = str(uuid.uuid4())
         node.level = kwargs["node_level"]
         return node
-    
-    @classmethod
-    def reset_node(cls, node: ContentNode) -> ContentNode:
-        pass
 
     @classmethod
     def regenerate_node(cls, node: ContentNode) -> ContentNode:

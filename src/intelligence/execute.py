@@ -17,6 +17,44 @@ class IntelligenceManger:
     def step(self, selected_node_ids, user_input, reset_node):
         import time
         print(selected_node_ids, user_input, reset_node)
+
+        # pre process
+        if reset_node is not None: # reset mode
+            # set the node to invalid
+            pass
+        else: # submit mode
+            if user_input is None: # view mode
+                # no need to create I node.
+                pass
+            else: # addition mode
+                if selected_node_ids is None:
+                    # all max level nodes are seleceted
+                    pass
+                # create new I node at max level of selected nodes
+                pass
+        
+        # real process
+        # invalid node regenerate 
+        for node in self.conv_nodes_obj.nodes:
+            if not node.valid:
+                pass
+        # new response node if inst not resped
+        for node in self.conv_nodes_obj.nodes:
+            if node.node_type == "I":
+                if node.note == "Process":
+                    # use process tool 
+                    pass
+                else:
+                    # use according tools 
+                    pass
+
+                # check edges, if no valid output, create new R node
+                # link new R node to selected_node_ids
+                pass
+
+
+
+
         for i in range(5):
             self.send_by_socketio({"obj": "pbar", "current": i, "total": 5})
             time.sleep(1)

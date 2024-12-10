@@ -11,16 +11,7 @@
     letter-spacing: 0.15em;
 }
 
-.mass-text-font {
-    font-family: 'Verdana', sans-serif;
-    font-size: medium;
-    border: 1px dashed #ccc;
-}
 
-.invalid-card-title {
-    font-family: 'Verdana', sans-serif;
-    font-size: xx-small;
-}
 
 .valid-card-title {
     font-family: 'Verdana', sans-serif;

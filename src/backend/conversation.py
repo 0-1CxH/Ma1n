@@ -261,7 +261,7 @@ class ConversationManager:
                 shutil.rmtree(conv_folder)
                 return {"code": 0}
             except:
-                return {"code": ret_code, "reason": "File Already Deleted."}
+                return {"code": -2, "reason": "File Already Deleted."}
         else:
             return {"code": -1, "reason": "No Permission."}
     
