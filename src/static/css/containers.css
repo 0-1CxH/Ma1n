@@ -209,9 +209,13 @@
 .mass-text-font {
   font-size: medium;
   border: 1px dashed #ccc;
+  border-radius: 8px;
+  padding: 10px;
 }
 
 .inline-card-title {
+  font-size: small;
   font-style: italic;
   color: gray;
+
 }

@@ -20,6 +20,11 @@ class BaseTool:
     def _execute(self) -> ContentNode:
         pass
 
+    
+    def _replay(self) -> ContentNode:
+        return self._execute()
+
+
     @classmethod
     def execute(cls, **kwargs):
         tool_obj = cls(**kwargs)
@@ -33,10 +38,27 @@ class BaseTool:
         node.node_id = str(uuid.uuid4())
         node.level = kwargs["node_level"]
         return node
-
+    
     @classmethod
-    def regenerate_node(cls, node: ContentNode) -> ContentNode:
-        pass
+    def replay(cls, node: ContentNode, **other_kwargs):
+        kwargs = node.source["args"]
+        kwargs.update(other_kwargs)
+        tool_obj = cls(**kwargs)
+        print(tool_obj)
+        try:
+            new_node = tool_obj._replay()
+            if new_node is None: # means do not support replay
+                return node
+            new_node.valid = True
+        except Exception as e:
+            new_node = tool_obj._default_node()
+            new_node.valid = False
+            new_node.note = e.__str__()
+        new_node.node_id = node.node_id
+        new_node.level = node.level
+        return new_node
+
+
 
 
 class InputTool(BaseTool):
@@ -55,6 +77,9 @@ class InputTool(BaseTool):
     
     def _default_node(self) -> ContentNode:
         return self._execute()
+    
+    def _replay(self):  # means do not support replay
+        return None
     
 
 class FrontendFileUploader(BaseTool):
@@ -79,6 +104,9 @@ class FrontendFileUploader(BaseTool):
             node_type="M",
             source={"tool": self.__class__.__name__},
         )
+    
+    def _replay(self):  # means do not support replay
+        return None
         
 
 class WgetDownloader(BaseTool):
@@ -115,9 +143,14 @@ class WgetDownloader(BaseTool):
 
 
 
-TOOL_ENTRY = {
-    "FrontendInitialInput": InputTool,
-    "FrontendFileUploader": FrontendFileUploader,
-    "WgetDownloader": WgetDownloader,
+class ToolCaller:
+    entry = {
+        "FrontendInitialInput": InputTool,
+        "FrontendFileUploader": FrontendFileUploader,
+        "WgetDownloader": WgetDownloader,
+    }
 
-}
+    @classmethod
+    def get_tool(cls, tool_to_get):
+        return cls.entry[tool_to_get]
+    

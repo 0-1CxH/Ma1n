@@ -12,7 +12,7 @@ from flask_socketio import emit
 from .sqlite_utils import sqlite_connect_and_execute
 from .defines import ConversationAbstract, ContentNode, ContentEdge, ConversationNodes
 from ..intelligence.execute import IntelligenceManger
-from ..intelligence.tools import TOOL_ENTRY
+from ..intelligence.tools import ToolCaller
 
 
 @dataclass
@@ -154,7 +154,7 @@ class ConversationManager:
             )
 
         # add user input first
-        node = TOOL_ENTRY["FrontendInitialInput"].execute(
+        node = ToolCaller.get_tool("FrontendInitialInput").execute(
             node_level = 0,
             input_content = all_submitted_content["user_input"],
             tool_name = "FrontendInitialInput",
@@ -172,7 +172,7 @@ class ConversationManager:
             num_nodes_created += 1
             send_progeress(f'Start processing material node: {upfile.filename} ')
 
-            node = TOOL_ENTRY["FrontendFileUploader"].execute(
+            node = ToolCaller.get_tool("FrontendFileUploader").execute(
                 node_level=0,
                 file_store_obj=upfile,
                 file_save_path=os.path.join(input_material_folder, upfile.filename)
@@ -190,7 +190,7 @@ class ConversationManager:
             num_nodes_created += 1
             send_progeress(f'Start processing material node: {elink} ')
 
-            node = TOOL_ENTRY["WgetDownloader"].execute(
+            node = ToolCaller.get_tool("WgetDownloader").execute(
                 node_level=0,
                 link=elink,
                 save_to_folder=input_material_folder,
@@ -273,11 +273,14 @@ class ConversationManager:
             fetch="one"
         )
         if owner == username:
-            spin_time = 10
-            while not ConversationFolderStructure.is_lock_expired(conv_folder):
-                print(f"{conv_folder} is locked")
-                time.sleep(spin_time)
-                spin_time *= 2
+            # spin_time = 10
+            # while not ConversationFolderStructure.is_lock_expired(conv_folder):
+            #     print(f"{conv_folder} is locked")
+            #     time.sleep(spin_time)
+            #     spin_time *= 2
+            if not ConversationFolderStructure.is_lock_expired(conv_folder):
+                return {"code": -2, "reason": "The session is currently being processed, therefore new request is not taken."}
+
             ConversationFolderStructure.add_lock(conv_folder)
             
             conv_abst_obj = ConversationFolderStructure.get_conv_abst_obj(conv_folder)

@@ -111,7 +111,6 @@ def register_main_routes(app, conversation_manager):
         file_path = request.args.get("path")
         if not (os.path.basename(os.path.dirname(file_path)) in ["input_material", "output_material" ] or "abst.json" in file_path or "nodes.json" in file_path):
             return {"code": -3, "reason": "Congrats! you found this vulnerability, but it is fixed."}
-        print("After check")
         user_store_root = os.path.join(conversation_manager.conversation_store_root, current_user.username) 
         if file_path.startswith(user_store_root) or current_user.has_view_all_permission():
             try:
