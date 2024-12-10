@@ -83,12 +83,19 @@ class IntelligenceManger:
         
         # real process
         # invalid node regenerate 
-        for idx, node in enumerate(self.conv_nodes_obj.nodes):
-            if not node.valid:
-                if node.source is not None:
-                    self.conv_nodes_obj.nodes[idx] = ToolCaller.get_tool(node.source["tool"]).replay(
-                        node, other_kwargs={}
-                    )
+        # for level, nodes in enumerate(nodes_by_level):
+        #     for idx, node in enumerate(nodes):
+        #         if not node.valid and node.source is not None:
+        #             nodes_by_level[level][idx] = 
+
+        # for idx, node in enumerate(self.conv_nodes_obj.nodes):
+        #     if not node.valid:
+        #         if node.source is not None:
+        #             self.conv_nodes_obj.nodes[idx] = ToolCaller.get_tool(node.source["tool"]).replay(
+        #                 node, other_kwargs={}
+        #             )
+            # if node.node_type == "M" and not node.intelligence_processed:
+            #     pass
         # not intellect processed material, use tool to summary
          
         # new response node if inst not resped
