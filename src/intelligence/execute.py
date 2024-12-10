@@ -39,7 +39,7 @@ class IntelligenceManger:
                 node_id = str(uuid.uuid4()),
                 level = lv ,
                 valid=True,
-                node_type="A",
+                node_type="M",
                 mime_type="text/code",
                 name=f"artifact{lv}.file",
                 note="This is the mock of generation messages",

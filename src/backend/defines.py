@@ -29,11 +29,11 @@ class ConversationAbstract:
 
 @dataclass
 class ContentNode:
-    node_id: str
-    level: int
-    valid: bool
-    node_type: str # M[material], A[artifact], I[instruction], R[response]
     name: str
+    node_type: str # M[material], A[artifact], I[instruction], R[response]
+    valid: bool = False
+    node_id: str = None
+    level: int = None
     source: dict = None # {"tool": "", "args": (,), "refs": []}
     mime_type: str = None
     note: str = None
@@ -44,25 +44,21 @@ class ContentNode:
     # for type I node:
     # name is full instruction
     # note is selected proc func
+    # source: indexInput additionalInput resetInput
 
     # for type M node:
-    # name is filename (if downloaded) or something short (if not)
-    # note is intelligence summary (if invalid, is the error msg)
+    # name is filename (if valid), or something short (if invalid)
+    # note is intelligence summary or generation message  (if invalid, is the error msg)
     # source should not be None, but defines the tool and args for regen
-    # mime_type should not be None
-    # attach the related_file_path if downloaded
+    # mime_type  is the type of file (if valid) or None (if invalid )
+    # attach the related_file_path (if valid) or none (if invalid)
+    # if want to use llm summary, intelligence_processed is false; else true
 
     # for type R node:
     # name is full response
     # note is x/y responses in batch
     # source is also required (for regenerate)
     
-    # for type A node:
-    # name is filename
-    # source should not be None, but defines the tool, args, ref nodes for regen
-    # mime_type is the type of file
-    # note is the generation message (description of arifact), (if invalid and not intel proced, is the error msg)
-    # attach the related_file_path
 
 
 

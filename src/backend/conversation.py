@@ -12,6 +12,7 @@ from flask_socketio import emit
 from .sqlite_utils import sqlite_connect_and_execute
 from .defines import ConversationAbstract, ContentNode, ContentEdge, ConversationNodes
 from ..intelligence.execute import IntelligenceManger
+from ..intelligence.tools import TOOL_ENTRY
 
 
 @dataclass
@@ -146,21 +147,22 @@ class ConversationManager:
         all_content_nodes = []
         num_nodes_to_create = 2 + len(all_submitted_content["uploaded_files"]) + len(all_submitted_content["entered_links"])
         num_nodes_created = 0
+        def send_progeress(message, level="info"):
+            socketio.emit('main_submit_progress_update', 
+                {'current': num_nodes_created, 'total': num_nodes_to_create,
+                'message': message, "level": level}
+            )
 
         # add user input first
-        all_content_nodes.append(ContentNode(
-            node_id = str(uuid.uuid4()),
-            level = 0,
-            valid = True,
-            node_type = "I",
-            name = all_submitted_content["user_input"],
-            note = all_submitted_content["selected_process_function"],
-        ))
-        num_nodes_created += 1
-        socketio.emit('main_submit_progress_update', 
-            {'current': num_nodes_created, 'total': num_nodes_to_create,
-            'message': f'Start processing user instruction content node.', "level": "info"}
+        node = TOOL_ENTRY["FrontendInitialInput"].execute(
+            node_level = 0,
+            input_content = all_submitted_content["user_input"],
+            tool_name = "FrontendInitialInput",
+            note_content = all_submitted_content["selected_process_function"],
         )
+        all_content_nodes.append(node)
+        num_nodes_created += 1
+        send_progeress(f'Start processing user instruction content node.')
 
         # process the files and links
         input_material_folder = os.path.join(conversation_folder, ConversationFolderStructure.input_material_folder_name)
@@ -168,77 +170,37 @@ class ConversationManager:
         os.makedirs(os.path.join(conversation_folder, ConversationFolderStructure.output_material_folder_name))
         for upfile in all_submitted_content["uploaded_files"]:
             num_nodes_created += 1
-            socketio.emit('main_submit_progress_update', 
-                {'current': num_nodes_created, 'total': num_nodes_to_create,
-                'message': f'Start processing material node: {upfile.filename} ', "level": "info"}
+            send_progeress(f'Start processing material node: {upfile.filename} ')
+
+            node = TOOL_ENTRY["FrontendFileUploader"].execute(
+                node_level=0,
+                file_store_obj=upfile,
+                file_save_path=os.path.join(input_material_folder, upfile.filename)
             )
-            save_upfile_path = os.path.join(input_material_folder, upfile.filename)
-            try:
-                upfile.save(save_upfile_path)
-                all_content_nodes.append(ContentNode(
-                    node_id = str(uuid.uuid4()),
-                    level = 0,
-                    valid = True,
-                    node_type = "M",
-                    name = upfile.filename,
-                    source={"tool": "FrontendUploader", "args": None},
-                    mime_type = upfile.mimetype,
-                    note = f"source:FrontendUploader({upfile.__str__()})",
-                    related_file_path = save_upfile_path,
-                ))
-            except Exception as e:
-                all_content_nodes.append(ContentNode(
-                    node_id = str(uuid.uuid4()),
-                    level = 0,
-                    valid = False,
-                    node_type = "M",
-                    name = upfile.filename,
-                    source={"tool": "FrontendUploader", "args": None},
-                    note = f"File save error: {upfile.__str__()} ; The reason is {e.__str__()}"
-                ))
+            all_content_nodes.append(node)
+            if not node.valid:
                 socketio.emit('main_submit_progress_update', 
                     {'current': num_nodes_created, 'total': num_nodes_to_create,
-                    'message': f"File save error: {upfile.__str__()} ; The reason is {e.__str__()}",
-                    "level": "error"}
+                        'message': node.note,
+                        "level": "error"}
                 )
+
         
         for elink in all_submitted_content["entered_links"]:
             num_nodes_created += 1
-            socketio.emit('main_submit_progress_update', 
-                {'current': num_nodes_created, 'total': num_nodes_to_create,
-                'message': f'Start processing material node: {elink} ', "level": "info"}
+            send_progeress(f'Start processing material node: {elink} ')
+
+            node = TOOL_ENTRY["WgetDownloader"].execute(
+                node_level=0,
+                link=elink,
+                save_to_folder=input_material_folder,
+                custom_progress_callback=lambda current_size, total_size, width: socketio.emit('main_submit_progress_update', {'current': num_nodes_created + 1.0 * current_size/ total_size, 'total': num_nodes_to_create, 'message': "none"})
             )
-            try:
-                response = requests.head(elink)
-                file_save_name = wget.download(
-                    url=elink, 
-                    out=input_material_folder, 
-                    bar=lambda current_size, total_size, width: socketio.emit('main_submit_progress_update', {'current': num_nodes_created + 1.0 * current_size/ total_size, 'total': num_nodes_to_create, 'message': "none"})
-                )
-                all_content_nodes.append(ContentNode(
-                    node_id = str(uuid.uuid4()),
-                    level = 0,
-                    valid = True,
-                    node_type = "M",
-                    name = os.path.basename(file_save_name), 
-                    source={"tool": "WgetDownloader", "args": (elink, )},
-                    mime_type = response.headers.get('Content-Type'),
-                    note = f"source:WgetDownloader({elink})",
-                    related_file_path = file_save_name,
-                ))
-            except Exception as e:
-                all_content_nodes.append(ContentNode(
-                    node_id = str(uuid.uuid4()),
-                    level = 0,
-                    valid = False,
-                    node_type = "M",
-                    name = elink,
-                    source={"tool": "WgetDownloader", "args": (elink, )},
-                    note = f"Link parse error: {elink} ; The reason is {e.__str__()}"
-                ))
+            all_content_nodes.append(node)
+            if not node.valid:
                 socketio.emit('main_submit_progress_update', 
                     {'current': num_nodes_created, 'total': num_nodes_to_create,
-                    'message': f"Link parse error: {elink} ; The reason is {e.__str__()}",
+                    'message': node.note,
                     "level": "error"}
                 )
 
@@ -263,7 +225,7 @@ class ConversationManager:
             fetch="one"
         )
         if owner == username or current_user.has_view_shared_permission():
-            conv_nodes_file = os.path.join(conv_folder, ConversationFolderStructure.nodes_filename)
+            # conv_nodes_file = os.path.join(conv_folder, ConversationFolderStructure.nodes_filename)
             try:
                 conv_nodes_file_content = ConversationFolderStructure.get_conv_nodes_obj(conv_folder, ret="dict")
                 return {
