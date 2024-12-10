@@ -9,7 +9,7 @@ class IntelligenceManger:
         self.conv_nodes_obj = conv_nodes_obj
         self.socketio = socketio
         self.mproc_pool = Pool(20)
-        print(self.conv_abst_obj, self.conv_nodes_obj)
+        # print(self.conv_abst_obj, self.conv_nodes_obj)
     
     def send_by_socketio(self, content):
         self.socketio.emit(
@@ -21,52 +21,65 @@ class IntelligenceManger:
         self.send_by_socketio({"obj": "pbar", "current": current, "total": total})
 
     def step(self, selected_node_ids, user_input, reset_node):
-        print(selected_node_ids, user_input, reset_node)
-
+        
         # pre process
         # check if file exists, if not set to invalid
-        if selected_node_ids is not None:
-            selected_node_ids.split(";")
         
+        print(f"{selected_node_ids=}")
+        print(f"{user_input=}")
+        print(f"{reset_node=}")
+
+        nodes_by_level = {}
+        largest_selected_level = -1 
         max_level = -1
-        current_level_node_ids = None
+
+        is_reset_mode = False
+        is_append_mode = False
+        is_view_mode = False
 
         for idx, node in enumerate(self.conv_nodes_obj.nodes):
             if reset_node is not None: # reset mode
+                is_reset_mode = True
                 if node.node_id == reset_node:
-                    self.conv_nodes_obj.nodes[idx].valid = False
-                    break
+                    node.valid = False
             else: # view/append mode
                 if selected_node_ids is not None:
                     if node.node_id in selected_node_ids:
-                        max_level = max(max_level, node.level)
-                else: # append mode
-                    if max_level < node.level:
-                        current_level_node_ids = [node.node_id]
-                        max_level = max(max_level, node.level)
-                    elif max_level == node.level:
-                        current_level_node_ids.append(node.node_id)
-                    else:
-                        pass
-        if current_level_node_ids is not None:
-            selected_node_ids = current_level_node_ids
+                        largest_selected_level = max(largest_selected_level, node.level)
+                else:
+                    max_level = max(max_level, node.level)
+            if node.level not in nodes_by_level:
+                nodes_by_level[node.level] = []
+            nodes_by_level[node.level].append(node)
         
-        print(max_level, selected_node_ids)
+        if not is_reset_mode: 
+            if largest_selected_level == -1:
+                selected_node_ids = [_.node_id for _ in nodes_by_level[max_level]]
+                largest_selected_level = max_level
+
+                print(f"{largest_selected_level, max_level=}")
         
-        # if reset_node is not None:
-        #     # set the node to invalid
-        #     # node.source["tool"]
-        #     pass
-        # else:
-        #     if user_input is None: # view mode
-        #         # no need to create I node.
-        #         pass
-        #     else: # addition mode
-        #         if selected_node_ids is None:
-        #             # all max level nodes are seleceted
-        #             pass
-        #         # create new I node at max level of selected nodes
-        #         pass
+            if user_input is not None: # append mode 
+                is_append_mode = True
+                # create I node
+                if largest_selected_level not in nodes_by_level:
+                    nodes_by_level[largest_selected_level] = []
+                nodes_by_level[largest_selected_level] = [ToolCaller.get_tool("FrontendAdditionalInput").execute(
+                    node_level=largest_selected_level,
+                    input_content=user_input,
+                    tool_name="FrontendAdditionalInput",
+                    note_content="Process"
+                )] + nodes_by_level[largest_selected_level]
+                selected_node_ids.append(nodes_by_level[largest_selected_level][0].node_id)
+            
+            if not is_append_mode:
+                is_view_mode = True
+
+
+        
+        print(largest_selected_level, selected_node_ids)
+        print(f"{is_reset_mode, is_append_mode, is_view_mode=}")
+        
         
         # real process
         # invalid node regenerate 

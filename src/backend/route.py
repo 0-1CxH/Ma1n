@@ -92,6 +92,8 @@ def register_main_routes(app, conversation_manager):
     def take_intelligence_step_by_id():
         session_id = request.form.get('sessionId')
         selected_node_ids = request.form.get('selectedNodes', None)
+        if selected_node_ids == '':
+            selected_node_ids = None
         if selected_node_ids:
             selected_node_ids = selected_node_ids.split(";")
         user_input = request.form.get('userInput', None)

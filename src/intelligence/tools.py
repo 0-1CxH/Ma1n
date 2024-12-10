@@ -146,6 +146,7 @@ class WgetDownloader(BaseTool):
 class ToolCaller:
     entry = {
         "FrontendInitialInput": InputTool,
+        "FrontendAdditionalInput": InputTool,
         "FrontendFileUploader": FrontendFileUploader,
         "WgetDownloader": WgetDownloader,
     }

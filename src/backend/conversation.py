@@ -278,8 +278,8 @@ class ConversationManager:
             #     print(f"{conv_folder} is locked")
             #     time.sleep(spin_time)
             #     spin_time *= 2
-            if not ConversationFolderStructure.is_lock_expired(conv_folder):
-                return {"code": -2, "reason": "The session is currently being processed, therefore new request is not taken."}
+            # if not ConversationFolderStructure.is_lock_expired(conv_folder):
+            #     return {"code": -2, "reason": "The session is currently being processed, therefore new request is not taken."}
 
             ConversationFolderStructure.add_lock(conv_folder)
             
